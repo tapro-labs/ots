@@ -6,7 +6,7 @@ def toKebabCase(String str) {
 
 def setBuildStatus(message, context, state) {
     def nodeName = env.NODE_NAME
-    container(nodeName.startsWith('techatom-jenkins-template') ? 'techatom-jenkins-builder' : 'techatom-jenkins-haskell-binary-compiler') {
+    container(nodeName.startsWith('techatom-jenkins-template') ? 'techatom-jenkins-builder' : 'techatom-jenkins-rust-binary-compiler') {
         def repoName = scm.getUserRemoteConfigs()[0].getUrl().replaceAll(/(git\@github\.com:)|(\.git)/, '')
         def commit = sh(script: "git rev-parse HEAD", returnStdout: true).trim()
         withCredentials([string(credentialsId: 'tapro-labs-github-token', variable: 'TOKEN')]) {
@@ -108,8 +108,8 @@ podTemplate(name: 'techatom-jenkins-template') {
 }
 
 
-podTemplate(name: 'techatom-haskell-build-template') {
-    node ('techatom-haskell-build-template'){
+podTemplate(name: 'techatom-rust-build-template') {
+    node ('techatom-rust-build-template'){
         def gitBranch = env.BRANCH_NAME
         def environment = "staging"
         int buildNumber = env.BUILD_NUMBER as int
@@ -117,7 +117,7 @@ podTemplate(name: 'techatom-haskell-build-template') {
         // if this is our initial build we skip it
         // as we are doing a manual build to make github plugin know about the job
         if (buildNumber <= 1) {
-            container('techatom-jenkins-haskell-binary-compiler') {
+            container('techatom-jenkins-rust-binary-compiler') {
               stage('Checkout') {
                   checkout scm
               }
@@ -130,17 +130,13 @@ podTemplate(name: 'techatom-haskell-build-template') {
             environment = "production"
         }
 
-        container('techatom-jenkins-haskell-binary-compiler') {
+        container('techatom-jenkins-rust-binary-compiler') {
             stage('Checkout') {
                 checkout scm
             }
 
             startStage("Install project dependencies and build") {
-              sh "cd ./backend && hpack && cabal update && cabal build -j1"
-            }
-
-            startStage("Copy binary to dist folder") {
-              sh "cd ./backend/ && mkdir _build && cp \$(cabal exec which ots-server) ./_build/ots-server"
+              sh "cd ./backend && cargo build --release"
             }
         }
 

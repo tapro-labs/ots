@@ -1,5 +1,1 @@
-*.cabal
-.stack-work
-dist-newstyle
-_build
-_custom_bins
+target

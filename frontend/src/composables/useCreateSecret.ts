@@ -15,7 +15,7 @@ export type CreateSecretOptions = {
 
 export default function useCreateSecret() {
   const { mutateAsync, isLoading: isCreating } = useMutation('create-secret', async (data: CreateSecretOptions) => {
-    const response = await otsClient.post('/secret', {
+    const response = await otsClient.post('/secrets', {
       secret: data.secret,
     });
 

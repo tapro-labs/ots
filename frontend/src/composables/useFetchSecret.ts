@@ -21,7 +21,7 @@ export default function useFetchSecret({ secretId, enabled }: FetchSecretOptions
   const { data, isLoading, isError } = useQuery(
     ['secret', secretId],
     async () => {
-      const response = await otsClient.get(`/secret/${secretId}`);
+      const response = await otsClient.get(`/secrets/${secretId}`);
 
       return response.data.secret as SecretData;
     },

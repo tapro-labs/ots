@@ -2,23 +2,8 @@ FROM debian:buster-slim
 
 LABEL maintainer "Tapro Labs <kontakt@taprolabs.de>"
 
-RUN set -ex  \
-    && apt-get update  \
-    && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        curl \
-        dpkg-dev \
-        gnupg \
-        libc6-dev \
-        libffi-dev \
-        libgmp-dev \
-        libnuma-dev \
-        libtinfo-dev \
-        zlib1g-dev \
-    && rm -rf /var/lib/apt/lists/*
+COPY ./backend/target/release/ots-server /usr/local/bin/ots-server
 
-COPY ./backend/_build/ots-server /usr/local/bin/ots-server
-
-EXPOSE 3000
+EXPOSE 8000
 
 CMD ["/usr/local/bin/ots-server"]

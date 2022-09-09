@@ -9,3 +9,4 @@ frontend/*.woff2
 node_modules
 ots
 .idea
+.DS_Store
