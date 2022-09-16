@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -e
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ROOT_DIR=$SCRIPT_DIR/../..
+CUSTOM_BIN_DIR=$ROOT_DIR/_custom_bins
+
+PACKAGE="hlint"
+
+if ! [[ -d $CUSTOM_BIN_DIR ]]; then
+    mkdir -p "$CUSTOM_BIN_DIR"
+fi
+
+case "$(uname)" in
+    "Darwin")
+        OS=osx;;
+    MINGW64_NT-*|MSYS_NT-*)
+        OS=windows;;
+    *)
+        OS=linux
+esac
+
+if [[ "$OS" = "windows" ]]; then
+    EXT=.zip
+    ESCEXT=\.zip
+else
+    EXT=.tar.gz
+    ESCEXT=\.tar\.gz
+fi
+
+echo Downloading $PACKAGE...
+# Don't go for the API since it hits the Appveyor GitHub API limit and fails
+RELEASES=$(curl --silent --show-error https://github.com/ndmitchell/$PACKAGE/releases)
+URL=https://github.com/$(echo $RELEASES | grep -o '\"[^\"]*-x86_64-'$OS$ESCEXT'\"' | sed s/\"//g | head -n1)
+VERSION=$(echo $URL | sed -n 's@.*-\(.*\)-x86_64-'$OS$ESCEXT'@\1@p')
+
+retry(){
+    ($@) && return
+    sleep 15
+    ($@) && return
+    sleep 15
+    $@
+}
+
+cd "$CUSTOM_BIN_DIR"
+
+retry curl --progress-bar --location -o "hlint$EXT"  $URL
+
+if [ "$OS" = "windows" ]; then
+    7z x -y hlint$EXT -o . -r > /dev/null
+else
+    tar -xzf hlint$EXT -C .
+fi
+
+mv hlint-$VERSION/hlint .
+
+echo "Cleaning up"
+rm -rf hlint-$VERSION
+rm hlint$EXT

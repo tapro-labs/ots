@@ -1,0 +1,24 @@
+{
+  "name": "@tapro-labs/one-time-secret",
+  "private": true,
+  "scripts": {
+    "prepare": "husky install && cd frontend && yarn install",
+    "lint-staged": "lint-staged"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@KaloyanYosifov.github.com:tapro-labs/one-time-secret.git"
+  },
+  "devDependencies": {
+    "lint-staged": "13.0.3",
+    "husky": "^8.0.1"
+  },
+  "volta": {
+    "node": "14.20.0",
+    "yarn": "1.22.17"
+  },
+  "engines": {
+    "node": ">= 14 <= 16",
+    "yarn": ">= 1.22"
+  }
+}

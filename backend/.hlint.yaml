@@ -1,0 +1,4 @@
+- arguments: [--color, --cpp-simple, -XQuasiQuotes]
+
+# Ignore some builtin hints
+- ignore: {name: Use newtype instead of data}

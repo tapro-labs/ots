@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Prepend the issue name to the commit message
+COMMIT_MSG_FILE=$1
+
+NAME=$(git symbolic-ref --short HEAD  | grep -o -E '[0-9]+' | head -1)
+if [ -n "$NAME" ]; then
+    echo "#$NAME - $(cat "$COMMIT_MSG_FILE")" > "$COMMIT_MSG_FILE"
+fi

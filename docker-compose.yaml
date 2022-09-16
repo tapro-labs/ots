@@ -1,0 +1,33 @@
+# DO NOT USE, NOT READY FOR DEV YET
+version: '3.7'
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  redis:
+    driver: local
+
+services:
+  redis:
+    image: redis:7.0.3-alpine
+    networks:
+      - backend
+    ports:
+      - 9015:6379
+    volumes:
+      - ./.docker-volumes/redis:/data
+
+  workspace:
+    build:
+      dockerfile: Dockerfile.local
+      context: .
+    depends_on:
+      - redis
+    networks:
+      - backend
+    ports:
+      - 9010:3000
+    volumes:
+      - ./backend:/app

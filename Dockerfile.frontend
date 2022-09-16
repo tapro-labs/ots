@@ -1,0 +1,11 @@
+FROM nginx:1.21.6-alpine
+
+COPY ./frontend/dist/ /usr/share/nginx/html/
+COPY ./frontend/.env.example /usr/share/nginx/html/.env.example
+
+COPY ./docker/scripts /scripts
+COPY ./docker/config/nginx.default.conf /etc/nginx/conf.d/default.conf
+
+RUN apk add bash
+
+CMD ["/bin/bash", "-c", "/scripts/nginx-env-injector && /scripts/js-env-injector && nginx -g \"daemon off;\""]

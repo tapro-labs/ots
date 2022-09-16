@@ -1,0 +1,11 @@
+#! /bin/bash
+
+if [[ -z $BACKEND_SERVER_HOST ]]; then
+  echo "No BACKEND_SERVER_HOST env is set!"
+  exit 1
+fi
+
+sed -i /etc/nginx/conf.d/default.conf -e "s/{{BACKEND_SERVER_HOST}}/$BACKEND_SERVER_HOST/g"
+
+echo "Done"
+

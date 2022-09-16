@@ -1,0 +1,3 @@
+backend/*.cabal
+backend/.stack-work
+backend/dist-newstyle

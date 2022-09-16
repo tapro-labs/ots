@@ -1,0 +1,10 @@
+{
+  "*.{ts,vue}": [
+    "yarn format -- src",
+    "yarn code-lint"
+  ],
+  "*.{css,scss}": [
+    "yarn format -- src",
+    "yarn style-lint"
+  ]
+}

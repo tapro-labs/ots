@@ -1,0 +1,28 @@
+#! /bin/bash
+
+cd /usr/share/nginx/html
+
+for line in $(cat .env.example); do
+  # Split env variables by character `=`
+  if printf '%s\n' "$line" | grep -q -e '='; then
+    varname=$(printf '%s\n' "$line" | sed -e 's/=.*//')
+    # uncomment if you want to get a value from .env-example
+    varvalue=$(printf '%s\n' "$line" | sed -e 's/^[^=]*=//')
+  fi
+
+  if [[ -z $varname ]] || [[ -z $varvalue ]]; then
+    continue
+  fi
+
+  # Read value of current variable if exists as Environment variable
+  value=$(printf '%s\n' "${!varname}")
+
+  if [[ -z $value ]]; then
+    continue
+  fi
+
+  grep -lr "$varvalue" ./assets/* | xargs sed -i "s#$varvalue#$value#g"
+done
+
+echo "Done"
+

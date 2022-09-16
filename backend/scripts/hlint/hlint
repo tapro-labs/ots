@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -e
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+ROOT_DIR=$SCRIPT_DIR/../..
+CUSTOM_BIN_DIR=$ROOT_DIR/_custom_bins
+
+if ! [[ -f $CUSTOM_BIN_DIR/hlint ]]; then
+    $SCRIPT_DIR/install-hlint
+fi
+
+cd $ROOT_DIR
+
+$CUSTOM_BIN_DIR/hlint src
