@@ -108,6 +108,7 @@ module.exports = {
     ],
     'import/no-mutable-exports': 'error',
     'import/no-unresolved': 'off',
+    'no-unused-vars': ['off'],
   },
   settings: {
     'import/resolver': {

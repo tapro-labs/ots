@@ -6,3 +6,6 @@ build_prod:
 
 dev-frontend:
 	cd frontend && yarn && yarn dev
+
+dev-backend:
+	cd backend && make dev

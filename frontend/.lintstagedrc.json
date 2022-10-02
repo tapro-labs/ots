@@ -1,10 +1,10 @@
 {
   "*.{ts,vue}": [
-    "cd frontend && yarn format -- src",
-    "cd frontend && yarn code-lint"
+    "yarn format src",
+    "yarn code-lint"
   ],
   "*.{css,scss}": [
-    "cd frontend && yarn format -- src",
-    "cd frontend && yarn style-lint"
+    "yarn format src",
+    "yarn style-lint"
   ]
 }

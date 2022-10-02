@@ -1,0 +1,6 @@
+{
+  "*.rs": [
+    "make format",
+    "make lint"
+  ]
+}

@@ -136,7 +136,7 @@ podTemplate(name: 'techatom-rust-build-template') {
             }
 
             startStage("Install project dependencies and build") {
-              sh "cd ./backend && cargo build --release"
+              sh "cd ./backend && ROCKET_PROFILE=release cargo build --release"
             }
         }
 
