@@ -8,6 +8,8 @@ RUN apt-get update && \
 COPY ./backend/target/release/ots_server /usr/local/bin/ots-server
 COPY ./backend/Rocket.toml /usr/local/bin/Rocket.toml
 
+ENV ROCKET_CONFIG=/usr/local/bin/Rocket.toml
+
 EXPOSE 8000
 
 CMD ["/usr/local/bin/ots-server"]
