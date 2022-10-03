@@ -21,7 +21,8 @@ for line in $(cat .env.example); do
     continue
   fi
 
-  grep -lr "$varvalue" ./assets/* | xargs sed -i "s#$varvalue#$value#g"
+  ESCAPED_REPLACE=$(printf '%s\n' "$value" | sed -e 's/[\/&]/\\&/g')
+  grep -lr "$varvalue" ./assets/* | xargs sed -i "s#$varvalue#$ESCAPED_REPLACE#g"
 done
 
 echo "Done"

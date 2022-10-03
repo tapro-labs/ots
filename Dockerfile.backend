@@ -2,6 +2,9 @@ FROM debian:buster-slim
 
 LABEL maintainer "Tapro Labs <kontakt@taprolabs.de>"
 
+RUN apt-get update && \
+    apt-get install -y ca-certificates
+
 COPY ./backend/target/release/ots_server /usr/local/bin/ots-server
 
 EXPOSE 8000
