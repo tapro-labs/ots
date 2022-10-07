@@ -1,4 +1,3 @@
-# DO NOT USE, NOT READY FOR DEV YET
 version: '3.7'
 
 networks:
@@ -7,6 +6,8 @@ networks:
 
 volumes:
   redis:
+    driver: local
+  rust_cache:
     driver: local
 
 services:
@@ -17,7 +18,7 @@ services:
     ports:
       - 9015:6379
     volumes:
-      - ./.docker-volumes/redis:/data
+      - redis:/data
 
   workspace:
     build:
@@ -28,6 +29,20 @@ services:
     networks:
       - backend
     ports:
-      - 9010:3000
+      - 9011:8000
     volumes:
       - ./backend:/app
+      - rust_cache:/usr/local/cargo
+
+  frontend:
+    image: node:14.20.0
+    depends_on:
+      - workspace
+    environment:
+      IN_DOCKER: 'yes'
+    ports:
+      - 9010:3000
+    command: bash -c "yarn && yarn dev"
+    working_dir: /app
+    volumes:
+      - ./frontend:/app

@@ -1,0 +1,13 @@
+FROM rust:1.62.1
+
+LABEL maintainer "Tapro Labs <kontakt@taprolabs.de>"
+
+WORKDIR /app
+
+RUN cargo install cargo-watch
+
+ENV ROCKET_PROFILE=docker
+
+EXPOSE 8000
+
+CMD ["make", "docker_dev"]

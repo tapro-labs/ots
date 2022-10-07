@@ -4,8 +4,14 @@ build_prod:
 	docker build -f Dockerfile.backend build
 	docker build -f Dockerfile.frontend build
 
-dev-frontend:
+dev_frontend:
 	cd frontend && yarn && yarn dev
 
-dev-backend:
+dev_backend:
 	cd backend && make dev
+
+start_docker:
+	docker-compose up -d
+
+stop_docker:
+	docker-compose down

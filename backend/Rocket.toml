@@ -9,6 +9,10 @@ limits = { form = "256 kB", json = "1 MiB" }
 [debug]
 log = "normal"
 
+[docker]
+address = "0.0.0.0"
+log = "normal"
+
 [release]
 address = "0.0.0.0"
 log = "critical"

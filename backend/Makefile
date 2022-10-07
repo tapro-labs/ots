@@ -4,6 +4,10 @@ default: dev
 dev:
 	ROCKET_SECRET_KEY="qpTdCblYgdwBv8TRyKpG0vgQ5rOSLq3aKDZWqQgU6Kk=" ROCKET_PROFILE=debug cargo watch -x run
 
+# key for local development only
+docker_dev:
+	ROCKET_SECRET_KEY="qpTdCblYgdwBv8TRyKpG0vgQ5rOSLq3aKDZWqQgU6Kk=" ROCKET_PROFILE=docker cargo watch -x run
+
 lint:
 	cargo clippy -- -D warnings
 
