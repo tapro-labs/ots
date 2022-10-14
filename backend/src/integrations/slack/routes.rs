@@ -1,16 +1,17 @@
-use envconfig::Envconfig;
-use rocket::response::status::BadRequest;
+use rocket::http::Status;
+
 use rocket::response::Redirect;
 use rocket::serde::{json::Json, Deserialize};
 use rocket::{get, post, routes, Route};
 
 use crate::integrations::slack::auth::SlackAccessToken;
 use crate::integrations::slack::client::SlackFetchUsersResponse;
-use crate::store::redis_store::RedisStore;
-use crate::utils::{time::Time, uuid::Uuid};
-use crate::GlobalOptions;
+use crate::integrations::slack::services::slack_authentication_service::{
+    authenticate, AuthenticationStatus,
+};
+use crate::{logger, GlobalOptions};
 
-use super::client::{Client, ClientOptions};
+use super::client::Client;
 
 #[derive(Deserialize)]
 struct SendMessageData {
@@ -31,12 +32,12 @@ pub fn api_routes() -> Vec<Route> {
 #[get("/slack/users")]
 async fn fetch_users(
     access_token: SlackAccessToken,
-) -> Result<Json<SlackFetchUsersResponse>, BadRequest<()>> {
-    let client = Client::new(ClientOptions::init_from_env().unwrap());
+) -> Result<Json<SlackFetchUsersResponse>, Status> {
+    let client = Client::new_defaults();
 
     match client.fetch_users(&access_token.access_token).await {
         Ok(response) => Ok(Json(response)),
-        _ => Err(BadRequest(None)),
+        Err(error) => Err(error.into()),
     }
 }
 
@@ -44,53 +45,33 @@ async fn fetch_users(
 async fn send_message(
     access_token: SlackAccessToken,
     data: Json<SendMessageData>,
-) -> Result<Json<()>, BadRequest<()>> {
-    let client = Client::new(ClientOptions::init_from_env().unwrap());
+) -> Result<Json<()>, Status> {
+    let client = Client::new_defaults();
 
     match client
         .send_message(&access_token.access_token, &data.channel_id, &data.message)
         .await
     {
         Ok(response) => Ok(Json(response)),
-        _ => Err(BadRequest(None)),
+        Err(error) => Err(error.into()),
     }
 }
 
 #[get("/slack/webhook?<code>")]
-async fn handle_webhook(code: &str) -> Result<Redirect, BadRequest<()>> {
-    let client = Client::new(ClientOptions::init_from_env().unwrap());
+async fn handle_webhook(code: &str) -> Result<Redirect, Status> {
+    logger::info("[SLACK] - Handling Webhook");
 
-    match client.fetch_auth_token(code).await {
-        Ok(response) => {
-            let mut redis_store = RedisStore::connect_default();
-            // TODO-SESSIONS
-            // We create a session id on demand
-            // in the future we might do this with initial load of our site
-            let session_id = Uuid::new_v4();
+    match authenticate(code).await {
+        AuthenticationStatus::Ok(_, session_id) => {
+            let url = format!(
+                "{}/?slack_api_token={}",
+                GlobalOptions::default().frontend_server_url,
+                session_id
+            );
+            let redirect = Redirect::to(url);
 
-            match redis_store.store_for_a_period(
-                format!("session:{}", session_id),
-                response.access_token,
-                // TODO-SLACK-ACCESS
-                // set it to smaller days
-                // and use refresh tokens
-                // for now we just rely on 401 returned
-                // from the server and frontend asking for user to connect again
-                Time::from_days(30),
-            ) {
-                Ok(_) => {
-                    let url = format!(
-                        "{}/?slack_api_token={}",
-                        GlobalOptions::default().server_url,
-                        session_id
-                    );
-                    let redirect = Redirect::to(url);
-
-                    Ok(redirect)
-                }
-                _ => Err(BadRequest(None)),
-            }
+            Ok(redirect)
         }
-        _ => Err(BadRequest(None)),
+        authentication_status => Err(authentication_status.into()),
     }
 }

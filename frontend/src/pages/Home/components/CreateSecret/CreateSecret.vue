@@ -18,7 +18,7 @@
 
     <div class="card-actions flex justify-between">
       <div class="flex justify-center">
-        <select-create-method class="mb-2" @change="createMethod = $event" />
+        <select-create-method @change="createMethod = $event" />
 
         <select-slack-user v-if="isSlackCreateMethod" class="ml-4" @change="onSlackUserSelected" />
       </div>

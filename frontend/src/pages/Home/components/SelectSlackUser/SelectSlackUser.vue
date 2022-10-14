@@ -1,9 +1,7 @@
 <template>
-  <div class="form-control">
-    <label v-if="apiToken" :for="inputId" class="label">
-      <!-- Dirty hack to fix layout -->
-      <span v-if="isLoading" class="label-text">&nbsp;</span>
-      <span v-else class="label-text">Select who should receive secret </span>
+  <div class="form-control flex justify-end">
+    <label v-if="!isLoading && apiToken" :for="inputId" class="label">
+      <span class="label-text">Select who should receive secret </span>
     </label>
 
     <connect-via-slack v-if="!apiToken" />

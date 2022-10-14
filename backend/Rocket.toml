@@ -7,12 +7,14 @@ write_timeout = 5
 limits = { form = "256 kB", json = "1 MiB" }
 
 [debug]
-log = "normal"
+log = "debug"
+tls = { key = "../server_ssl/default.key", certs = "../server_ssl/default.crt" }
 
 [docker]
 address = "0.0.0.0"
-log = "normal"
+log = "debug"
 
 [release]
 address = "0.0.0.0"
 log = "critical"
+

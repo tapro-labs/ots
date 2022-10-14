@@ -15,3 +15,6 @@ start_docker:
 
 stop_docker:
 	docker-compose down
+
+generate_ssl:
+	./server_ssl/generate-ssl.sh

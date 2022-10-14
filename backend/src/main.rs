@@ -2,6 +2,8 @@ use dotenv::dotenv;
 use envconfig::Envconfig;
 use rocket::{get, routes};
 
+use crate::utils::logger;
+
 mod app;
 mod integrations;
 mod store;
@@ -9,8 +11,11 @@ mod utils;
 
 #[derive(Envconfig)]
 pub struct GlobalOptions {
-    #[envconfig(from = "SERVER_URL", default = "")]
-    server_url: String,
+    #[envconfig(from = "FRONTEND_SERVER_URL", default = "")]
+    frontend_server_url: String,
+
+    #[envconfig(from = "BACKEND_SERVER_URL", default = "")]
+    backend_server_url: String,
 }
 
 impl Default for GlobalOptions {
