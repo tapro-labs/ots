@@ -49,7 +49,9 @@ export default defineComponent({
     const inputId = nanoid();
     const { apiToken } = useApiToken();
     const { users, isLoading } = useFetchUsers();
-    const nonBotUsers = computed(() => users.value.filter(user => !user.isBot));
+    const nonBotUsers = computed(() =>
+      users.value.filter(user => user.name !== 'Slackbot' && !user.isBot && !user.deleted)
+    );
 
     const onSelect = (event: Event) => {
       const id: string = (event?.target as HTMLSelectElement).value;

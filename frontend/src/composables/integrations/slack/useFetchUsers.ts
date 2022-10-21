@@ -15,6 +15,7 @@ export type SlackUser = {
   id: string;
   name: string;
   isBot: boolean;
+  deleted: boolean;
   imageUrl: string;
 };
 

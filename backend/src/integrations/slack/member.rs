@@ -8,6 +8,8 @@ pub struct Member {
     #[serde(rename(serialize = "isBot"))]
     is_bot: bool,
 
+    deleted: bool,
+
     #[serde(rename(serialize = "imageUrl"))]
     image_url: String,
 }
@@ -21,6 +23,7 @@ impl<'de> Deserialize<'de> for Member {
         struct UserObject {
             id: String,
             is_bot: bool,
+            deleted: bool,
             profile: ProfileObject,
         }
 
@@ -34,6 +37,7 @@ impl<'de> Deserialize<'de> for Member {
         Ok(Self {
             id: helper.id,
             is_bot: helper.is_bot,
+            deleted: helper.deleted,
             name: helper.profile.real_name,
             image_url: helper.profile.image_512,
         })
