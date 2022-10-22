@@ -13,3 +13,7 @@ lint:
 
 format:
 	cargo clippy --allow-dirty --allow-staged --fix
+
+test:
+	echo "test"
+

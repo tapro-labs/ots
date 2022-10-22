@@ -9,8 +9,7 @@
     "preview": "vite preview",
     "format": "prettier --write --list-different --config .prettierrc.cjs",
     "code-lint": "eslint --fix",
-    "style-lint": "stylelint --fix",
-    "test": "echo 'test'"
+    "style-lint": "stylelint --fix"
   },
   "dependencies": {
     "@vueuse/core": "^9.2.0",
