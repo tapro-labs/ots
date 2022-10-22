@@ -46,7 +46,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: frontend-build
-          path: ${{ github.workspace }}/frontend/dist/**
+          path: ${{ github.workspace }}/frontend/dist/
           if-no-files-found: error
           retention-days: 1
 
@@ -124,14 +124,14 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: backend-build
-          path: ./backend/target/release/ots_server
+          path: ./backend/target/release/ # ots_server executable will be put under release
 
       - name: 'Download frontend artifact'
         if: ${{ needs.changes.outputs.frontend == 'true' }}
         uses: actions/download-artifact@v3
         with:
           name: frontend-build
-          path: ./frontend/dist/
+          path: ./frontend/ # dist directory will be put under frontend directory
 
       - name: 'Build backend docker image'
         if: ${{ needs.changes.outputs.backend == 'true' }}

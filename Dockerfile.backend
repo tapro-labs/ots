@@ -8,6 +8,8 @@ RUN apt-get update && \
 COPY ./backend/target/release/ots_server /usr/local/bin/ots-server
 COPY ./backend/Rocket.toml /usr/local/bin/Rocket.toml
 
+RUN chmod u+x /usr/local/bin/ots-server
+
 ENV ROCKET_CONFIG=/usr/local/bin/Rocket.toml
 
 EXPOSE 8000
