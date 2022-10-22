@@ -151,17 +151,17 @@ jobs:
 
       - name: 'Tag and push backend docker image'
         run: |
-          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}:production ${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.run_id }}
+          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}:production ${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.run_number }}
           docker push ${{ env.DOCKER_BACKEND_IMAGE }}:production
-          docker push ${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.run_id }}
+          docker push ${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.run_number }}
 
       - name: 'Tag and push frontend docker image'
         run: |
-          docker tag ${{ env.DOCKER_FRONTEND_IMAGE }}:production ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.run_id }}
+          docker tag ${{ env.DOCKER_FRONTEND_IMAGE }}:production ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.run_number }}
           docker push ${{ env.DOCKER_FRONTEND_IMAGE }}:production
-          docker push ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.run_id }}
+          docker push ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.run_number }}
 
       - name: 'Deploy'
         run: |
-          kubectl set image deployment/ots-backend -n ${{ env.DEPLOYMENT_NAMESPACE }} ots-backend=${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.run_id }}
-          kubectl set image deployment/ots-frontend -n ${{ env.DEPLOYMENT_NAMESPACE }} ots-frontend=${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.run_id }}
+          kubectl set image deployment/ots-backend -n ${{ env.DEPLOYMENT_NAMESPACE }} ots-backend=${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.run_number }}
+          kubectl set image deployment/ots-frontend -n ${{ env.DEPLOYMENT_NAMESPACE }} ots-frontend=${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.run_number }}
