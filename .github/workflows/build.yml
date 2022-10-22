@@ -41,7 +41,7 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Build app
-        run: yarn build
+        run: cp .env.example .env && yarn build
       - name: Archive dist folder
         uses: actions/upload-artifact@v3
         with:
