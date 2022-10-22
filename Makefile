@@ -18,3 +18,6 @@ stop_docker:
 
 generate_ssl:
 	./server_ssl/generate-ssl.sh
+
+test:
+	echo "test"
