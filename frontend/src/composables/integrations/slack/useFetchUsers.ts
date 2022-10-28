@@ -2,7 +2,7 @@
  * External dependencies.
  */
 import { computed } from 'vue';
-import { useQuery } from 'vue-query';
+import { useQuery } from '@tanstack/vue-query';
 import type { AxiosError } from 'axios';
 
 /**
@@ -22,7 +22,7 @@ export type SlackUser = {
 export default function useFetchUsers() {
   const { apiToken, resetApiToken } = useApiToken();
 
-  const { data, isLoading, isError } = useQuery<SlackUser[]>(
+  const { data, isLoading, isError, fetchStatus } = useQuery<SlackUser[]>(
     ['slack-users', apiToken],
     async () => {
       try {
@@ -50,7 +50,10 @@ export default function useFetchUsers() {
 
   return {
     isError,
-    isLoading,
     users: computed(() => data.value || []),
+    // Query has changed how isLoading works 🤦‍
+    // @see https://github.com/TanStack/query/issues/3584 (reported issue)
+    // @see https://github.com/TanStack/query/issues/3975#issuecomment-1245101647 (v5 fix)
+    isLoading: computed(() => isLoading.value && fetchStatus.value !== 'idle'),
   };
 }

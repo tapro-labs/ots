@@ -2,7 +2,7 @@
  * External dependencies.
  */
 import { createApp } from 'vue';
-import { QueryClient, VueQueryPlugin } from 'vue-query';
+import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
 
 /**
  * Internal dependencies.
@@ -17,6 +17,11 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       staleTime: 60 * 1000, // 1 minute
+
+      // prevents from open secret to be refetched
+      refetchInterval: false,
+      refetchIntervalInBackground: false,
+      refetchOnWindowFocus: false,
     },
   },
 });

@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-import { useMutation } from 'vue-query';
+import { useMutation } from '@tanstack/vue-query';
 
 /**
  * Internal dependencies.
@@ -14,7 +14,7 @@ export type CreateSecretOptions = {
 };
 
 export default function useCreateSecret() {
-  const { mutateAsync, isLoading: isCreating } = useMutation('create-secret', async (data: CreateSecretOptions) => {
+  const { mutateAsync, isLoading: isCreating } = useMutation(async (data: CreateSecretOptions) => {
     const response = await otsClient.post('/secrets', {
       secret: data.secret,
     });

@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-import { useMutation } from 'vue-query';
+import { useMutation } from '@tanstack/vue-query';
 
 /**
  * Internal dependencies.

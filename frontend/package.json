@@ -12,13 +12,13 @@
     "style-lint": "stylelint --fix"
   },
   "dependencies": {
+    "@tanstack/vue-query": "^4.13.3",
     "@vueuse/core": "^9.2.0",
     "axios": "^0.27.2",
     "daisyui": "^2.19.0",
     "epic-spinners": "^1.1.0",
     "nanoid": "^4.0.0",
     "vue": "^3.2.37",
-    "vue-query": "^1.25.2",
     "vue-router": "^4.1.2"
   },
   "devDependencies": {
