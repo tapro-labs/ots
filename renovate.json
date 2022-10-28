@@ -1,0 +1,67 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "rangeStrategy": "bump",
+  "dependencyDashboard": false,
+  "timezone": "Europe/Berlin",
+  "schedule": ["every weekend"],
+  "gitLabIgnoreApprovals": true,
+  "patch": {
+    "prPriority": 30
+  },
+  "minor": {
+    "prPriority": 20
+  },
+  "major": {
+    "prPriority": 10
+  },
+  "prConcurrentLimit": 12,
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "labels": [
+        "renovate-minor"
+      ],
+      "prHourlyLimit": 2,
+      "rebaseWhen": "never"
+    },
+
+    {
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "labels": [
+        "renovate-major"
+      ],
+      "rebaseWhen": "never",
+      "prHourlyLimit": 2
+    },
+
+    {
+      "matchPackagePrefixes": [
+        "eslint",
+        "@types",
+        "stylelint"
+      ],
+      "matchPackageNames": [
+        "@vue/test-utils",
+        "vitest",
+        "vue-eslint-parser",
+        "@typescript-eslint/parser"
+      ],
+      "automerge": true,
+      "platformAutomerge": true,
+      "labels": [
+        "renovate-auto"
+      ],
+      "reviewers": [ ],
+      "rebaseWhen": "auto",
+      "prHourlyLimit": 2
+    }
+  ]
+}
