@@ -58,6 +58,7 @@
       "labels": [
         "renovate-auto"
       ],
+      "automergeSchedule": ["every weekend"],
       "reviewers": [ ],
       "rebaseWhen": "auto",
       "prHourlyLimit": 2
