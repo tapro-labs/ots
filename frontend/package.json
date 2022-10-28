@@ -8,8 +8,10 @@
     "build": "vue-tsc --noEmit && vite build",
     "preview": "vite preview",
     "format": "prettier --write --list-different --config .prettierrc.cjs",
-    "code-lint": "eslint --fix",
-    "style-lint": "stylelint --fix"
+    "code-lint-fix": "eslint --fix",
+    "style-lint-fix": "stylelint --fix",
+    "code-lint-check": "eslint ./src --ext .ts,.vue",
+    "style-lint-check": "stylelint ./src/*.{css,scss,vue} ./src/**/*.{css,scss,vue}"
   },
   "dependencies": {
     "@tanstack/vue-query": "^4.13.3",
@@ -34,10 +36,14 @@
     "eslint-plugin-unicorn": "43.0.2",
     "eslint-plugin-vue": "9.3.0",
     "postcss": "^8.4.14",
+    "postcss-html": "^1.5.0",
     "prettier": "2.7.1",
     "sass": "^1.53.0",
-    "stylelint": "14.9.1",
+    "stylelint": "14.14.0",
     "stylelint-config-standard": "26.0.0",
+    "stylelint-config-standard-scss": "^6.0.0",
+    "stylelint-config-standard-vue": "^1.0.0",
+    "stylelint-scss": "^4.3.0",
     "tailwindcss": "^3.1.6",
     "typescript": "^4.6.4",
     "vite": "^3.0.0",

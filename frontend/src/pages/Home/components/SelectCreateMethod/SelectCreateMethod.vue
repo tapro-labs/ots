@@ -5,7 +5,7 @@
     </label>
 
     <select :id="inputId" v-model="type" class="select select-bordered w-full max-w-xs">
-      <option v-for="option in options" :value="option.value">{{ option.label }}</option>
+      <option v-for="option in options" :key="option.value" :value="option.value">{{ option.label }}</option>
     </select>
   </div>
 </template>

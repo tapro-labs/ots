@@ -1,0 +1,80 @@
+name: PR checks
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+
+jobs:
+  # JOB to run change detection
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            frontend:
+              - 'frontend/**'
+
+  base_check:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14.20.0
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+  frontend_check:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 14.20.0
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+      - name: Linting
+        run: yarn code-lint-check && yarn style-lint-check
+
+  backend_check:
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Install rust version
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: 1.62.1
+          override: true
+      - name: Linting
+        run: make lint
