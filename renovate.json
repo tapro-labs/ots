@@ -7,7 +7,6 @@
   "dependencyDashboard": false,
   "timezone": "Europe/Berlin",
   "schedule": ["every weekend"],
-  "gitLabIgnoreApprovals": true,
   "patch": {
     "prPriority": 30
   },
