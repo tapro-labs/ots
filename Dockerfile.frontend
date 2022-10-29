@@ -1,4 +1,4 @@
-FROM nginx:1.21.6-alpine
+FROM nginx:1.23.2-alpine
 
 COPY ./frontend/dist/ /usr/share/nginx/html/
 COPY ./frontend/.env.example /usr/share/nginx/html/.env.example

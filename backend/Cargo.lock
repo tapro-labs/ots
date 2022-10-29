@@ -1026,16 +1026,15 @@ dependencies = [
 
 [[package]]
 name = "redis"
-version = "0.21.6"
+version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "571c252c68d09a2ad3e49edd14e9ee48932f3e0f27b06b4ea4c9b2a706d31103"
+checksum = "513b3649f1a111c17954296e4a3b9eecb108b766c803e2b99f179ebe27005985"
 dependencies = [
- "async-trait",
  "combine",
  "itoa",
  "percent-encoding",
  "ryu",
- "sha1",
+ "sha1_smol",
  "url",
 ]
 
@@ -1367,15 +1366,6 @@ dependencies = [
  "itoa",
  "ryu",
  "serde",
-]
-
-[[package]]
-name = "sha1"
-version = "0.6.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1da05c97445caa12d05e848c4a4fcbbea29e748ac28f7e80e9b010392063770"
-dependencies = [
- "sha1_smol",
 ]
 
 [[package]]
@@ -1782,9 +1772,9 @@ dependencies = [
 
 [[package]]
 name = "uuid"
-version = "1.1.2"
+version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd6469f4314d5f1ffec476e05f17cc9a78bc7a27a6a857842170bdf8d6f98d2f"
+checksum = "feb41e78f93363bb2df8b0e86a2ca30eed7806ea16ea0c790d757cf93f79be83"
 dependencies = [
  "getrandom",
 ]
