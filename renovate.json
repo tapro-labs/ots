@@ -27,7 +27,9 @@
         "renovate-minor"
       ],
       "prHourlyLimit": 2,
-      "rebaseWhen": "never"
+      "rebaseWhen": "never",
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch"
     },
 
     {
