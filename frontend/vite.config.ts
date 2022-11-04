@@ -66,7 +66,6 @@ export default defineConfig({
   resolve: {
     alias: {
       ...alias,
-      crypto: 'crypto-browserify',
     },
   },
 });

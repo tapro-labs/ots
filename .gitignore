@@ -15,3 +15,5 @@ server_ssl/*
 !server_ssl/README.md
 !server_ssl/generate-ssl.sh
 !server_ssl/default.conf
+
+*.log
