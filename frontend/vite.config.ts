@@ -64,6 +64,9 @@ export default defineConfig({
   },
   plugins: [vue()],
   resolve: {
-    alias,
+    alias: {
+      ...alias,
+      crypto: 'crypto-browserify',
+    },
   },
 });

@@ -18,7 +18,7 @@
 
             <template v-else-if="showSecret && !isLoading">
               <div class="form-control mb-4">
-                <textarea :value="secret" class="textarea reveal-secret-textarea textarea-disabled" disabled />
+                <textarea :value="decryptedSecret" class="textarea reveal-secret-textarea textarea-disabled" disabled />
 
                 <label class="label">
                   <span class="text-info font-bold label-text-alt">
@@ -50,7 +50,7 @@
  * External dependencies.
  */
 import { useRoute } from 'vue-router';
-import { defineComponent, ref } from 'vue';
+import { computed, ComputedRef, defineComponent, ref } from 'vue';
 
 /**
  * Internal dependencies.
@@ -58,6 +58,7 @@ import { defineComponent, ref } from 'vue';
 import { SecretId } from '@/types/SecretTypes';
 import useFetchSecret from '@/composables/useFetchSecret';
 import TheHeader from '@/components/TheHeader/TheHeader.vue';
+import { decrypt, SecretCryptograhyKey } from '@/utils/cryptography';
 
 export default defineComponent({
   name: 'Secret',
@@ -74,13 +75,27 @@ export default defineComponent({
       secretId,
       enabled: showSecret,
     });
+    const cryptographyDetails: ComputedRef<{ secretKey: SecretCryptograhyKey; secretType: string }> = computed(() => {
+      try {
+        return JSON.parse(window.atob(route.hash.replace('#', '')));
+      } catch (a) {
+        return { secretKey: '', secretType: '' };
+      }
+    });
+    const decryptedSecret = computed(() => {
+      if (!secret.value) {
+        return undefined;
+      }
+
+      return decrypt(cryptographyDetails.value.secretKey, secret.value);
+    });
 
     return {
-      secret,
       isError,
       secretId,
       isLoading,
       showSecret,
+      decryptedSecret,
     };
   },
 });

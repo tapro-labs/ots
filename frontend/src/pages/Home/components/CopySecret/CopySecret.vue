@@ -3,7 +3,7 @@
     <h3>Secret created! Copy the link below and send it to your buddy!</h3>
 
     <div>
-      <input :value="secretLink" autofocus class="input w-full" disabled />
+      <input :value="secretUrl" autofocus class="input w-full" disabled />
     </div>
 
     <p>
@@ -16,7 +16,7 @@
 /**
  * External dependencies.
  */
-import { computed, defineComponent, PropType, toRefs } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
 /**
  * Internal dependencies.
@@ -27,19 +27,10 @@ export default defineComponent({
   name: 'CopySecret',
 
   props: {
-    secretId: {
+    secretUrl: {
       type: String as PropType<SecretId>,
       required: true,
     },
-  },
-
-  setup(props) {
-    const { secretId } = toRefs(props);
-    const secretLink = computed(() => window.location.origin + '/secret/' + secretId.value);
-
-    return {
-      secretLink,
-    };
   },
 });
 </script>

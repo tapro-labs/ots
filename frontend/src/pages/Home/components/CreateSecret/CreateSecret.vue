@@ -44,7 +44,6 @@ import { computed, defineComponent, Ref, ref, watch } from 'vue';
 /**
  * Internal dependencies.
  */
-import { SecretId } from '@/types/SecretTypes';
 import useCreateSecret from '@/composables/useCreateSecret';
 import SelectCreateMethod from '@/pages/Home/components/SelectCreateMethod/SelectCreateMethod.vue';
 import SelectSlackUser from '@/pages/Home/components/SelectSlackUser/SelectSlackUser.vue';
@@ -52,6 +51,7 @@ import useApiToken from '@/composables/integrations/slack/useApiToken';
 import useSendMessage from '@/composables/integrations/slack/useSendMessage';
 import { SlackUser } from '@/composables/integrations/slack/useFetchUsers';
 import { SecretCreateMethod } from '@/enums/SecretCreateMethod';
+import { createRandomSecret, DEFAULT_SECRET_LENGTH, encrypt } from '@/utils/cryptography';
 
 export default defineComponent({
   name: 'CreateSecret',
@@ -62,7 +62,7 @@ export default defineComponent({
   },
 
   emits: {
-    created(_payload: { secretId: SecretId; createMethod: SecretCreateMethod }) {
+    created(_payload: { secretUrl: string; createMethod: SecretCreateMethod }) {
       return true;
     },
   },
@@ -87,12 +87,15 @@ export default defineComponent({
         return;
       }
 
-      const secretId = await createSecret({ secret: secret.value });
+      const secretKey = await createRandomSecret(DEFAULT_SECRET_LENGTH);
+      const secretId = await createSecret({ secret: encrypt(secretKey, secret.value) });
+      const cryptograhyDetails = window.btoa(JSON.stringify({ secretKey, secretType: 'plain' }));
+      const secretUrl = window.location.origin + '/secret/' + secretId + '#' + cryptograhyDetails;
 
       if (isSlackCreateMethod.value && selectedSlackUser?.value?.id) {
         await sendMessage({
           channelId: selectedSlackUser.value.id,
-          message: `Secret: ${window.location.origin + '/secret/' + secretId}`,
+          message: `Secret: ${secretUrl}`,
         });
       }
 
@@ -100,7 +103,7 @@ export default defineComponent({
       secret.value = '';
 
       emit('created', {
-        secretId,
+        secretUrl,
         createMethod: createMethod.value,
       });
     };
