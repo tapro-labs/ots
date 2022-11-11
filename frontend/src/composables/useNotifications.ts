@@ -15,6 +15,11 @@ export type Notification = {
   error: boolean;
 };
 
+export type NotificationCallbackArguments = {
+  message: Notification['message'];
+  duration?: Notification['duration'];
+};
+
 const { trigger, subscribe, unsubscribe } = useObserver<Notification>();
 
 type NotificationCallback = Parameters<typeof subscribe>[0];
@@ -22,14 +27,14 @@ type NotificationCallback = Parameters<typeof subscribe>[0];
 export default function useNotifications() {
   const localNotificationCallbacks: NotificationCallback[] = [];
   const currentComponent = getCurrentInstance();
-  const setSuccessMessage = ({ message, duration = 3000 }: Omit<Notification, 'error'>) => {
+  const setSuccessMessage = ({ message, duration = 3000 }: NotificationCallbackArguments) => {
     return trigger({
       message,
       duration,
       error: false,
     });
   };
-  const setErrorMessage = ({ message, duration = 3000 }: Omit<Notification, 'error'>) => {
+  const setErrorMessage = ({ message, duration = 3000 }: NotificationCallbackArguments) => {
     return trigger({
       message,
       duration,

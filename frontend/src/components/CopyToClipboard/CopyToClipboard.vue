@@ -4,12 +4,12 @@
   </button>
 </template>
 
-<script>
+<script lang="ts">
 /**
  * External dependencies.
  */
-import { toRefs } from 'vue';
 import copy from 'copy-to-clipboard';
+import { defineComponent, toRefs } from 'vue';
 import { ClipboardIcon } from '@heroicons/vue/24/outline';
 import useNotifications from '@/composables/useNotifications';
 
@@ -17,7 +17,7 @@ import useNotifications from '@/composables/useNotifications';
  * Internal dependencies.
  */
 
-export default {
+export default defineComponent({
   name: 'CopyToClipboard',
 
   components: {
@@ -52,5 +52,5 @@ export default {
       },
     };
   },
-};
+});
 </script>

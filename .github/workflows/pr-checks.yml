@@ -51,6 +51,8 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Linting
         run: yarn code-lint-check && yarn style-lint-check
+      - name: Build app
+        run: cp .env.example .env && yarn build
 
   backend_check:
     needs: changes
