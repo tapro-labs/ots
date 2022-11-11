@@ -1,4 +1,6 @@
 <template>
+  <notification-popup />
+
   <router-view />
 </template>
 
@@ -8,5 +10,12 @@
  */
 import { defineComponent } from 'vue';
 
-export default defineComponent({});
+/**
+ * Internal dependencies.
+ */
+import NotificationPopup from '@/components/NotificationsPopup/NotificationsPopup.vue';
+
+export default defineComponent({
+  components: { NotificationPopup },
+});
 </script>

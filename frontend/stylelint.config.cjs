@@ -4,6 +4,7 @@ module.exports = {
     'stylelint-config-standard-vue/scss'
   ],
   rules:     {
+    'string-quotes': 'single',
     'scss/at-rule-no-unknown': [
       true,
       {

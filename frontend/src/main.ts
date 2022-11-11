@@ -2,6 +2,7 @@
  * External dependencies.
  */
 import { createApp } from 'vue';
+import Notifications from '@kyvg/vue3-notification';
 import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
 
 /**
@@ -30,5 +31,6 @@ createApp(App)
   .use(VueQueryPlugin, {
     queryClient,
   })
+  .use(Notifications)
   .use(Router)
   .mount('#app');

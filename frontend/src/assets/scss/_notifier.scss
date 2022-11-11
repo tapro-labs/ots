@@ -1,0 +1,117 @@
+/* ------------------------------------------------------------ *\
+    Vue notification
+\* ------------------------------------------------------------ */
+.vue-notification-group {
+  z-index: 9999999 !important;
+
+  @media (max-width: 479px) {
+    width: 100% !important;
+  }
+}
+
+.vue-notification-wrapper {
+  padding: 20px !important;
+
+  .notification-popup {
+    position: relative;
+    max-width: 340px;
+    width: 100%;
+    height: auto;
+    border-radius: 20px 0 0 20px;
+    box-shadow: 0 10px 30px -5px rgb(0 0 0 / 5%);
+    background: #83e0b0;
+    color: #fff;
+    padding: 20px;
+    margin: 3px 10px 3px 0;
+
+    &.error {
+      background: #f00;
+    }
+
+    .notification-content {
+      a {
+        color: #fff;
+        text-decoration: underline;
+      }
+    }
+
+    @media (max-width: 479px) {
+      border-radius: 0;
+      max-width: 100%;
+    }
+  }
+}
+
+/* ------------------------------------------------------------ *\
+	Notifier
+\* ------------------------------------------------------------ */
+
+.notifier {
+  $self: &;
+
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 20px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 4px 4px 15px 0 rgb(0 0 0 / 18%);
+  font-weight: 700;
+  color: #000;
+
+  &::before {
+    // Hide the duration progress bar.
+    display: none;
+
+    // Hide the duration progress bar.
+
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 4px;
+    background: #000;
+    animation-duration: 3.5s;
+    animation-name: fill;
+  }
+
+  &.error {
+    padding-left: 0;
+
+    &::before {
+      background: rgb(176 0 32);
+    }
+  }
+
+  &.success::before {
+    background: rgb(89 177 137);
+  }
+
+  &:not(.error) {
+    #{$self}__icon {
+      margin-right: 10px;
+    }
+  }
+
+  &__title {
+    font-size: 17px;
+    text-transform: uppercase;
+  }
+
+  &__entry {
+    font-size: 13px;
+  }
+}
+
+@keyframes fill {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}

@@ -14,15 +14,19 @@
     "style-lint-check": "stylelint ./src/*.{css,scss,vue} ./src/**/*.{css,scss,vue}"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.0.13",
+    "@kyvg/vue3-notification": "^2.6.1",
     "@tanstack/vue-query": "^4.14.5",
     "@vueuse/core": "^9.4.0",
     "axios": "^0.27.2",
-    "daisyui": "^2.38.1",
+    "copy-to-clipboard": "^3.3.2",
+    "daisyui": "^2.39.1",
     "epic-spinners": "^1.1.0",
     "generate-password-browser": "^1.1.0",
     "nanoid": "^4.0.0",
     "sjcl": "^1.0.8",
     "vue": "^3.2.41",
+    "vue-lottie": "^0.2.1",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
