@@ -8,8 +8,8 @@
           <div class="prose max-w-full">
             <h3>Your secret is below</h3>
 
-            <template v-if="!isLoading && isError">
-              <p class="text-error">The secret has already been revealed!</p>
+            <template v-if="!isLoading && errorMessage">
+              <p class="text-error">{{ errorMessage }}</p>
 
               <router-link is="button" :to="{ name: 'Home' }" class="btn btn-primary">
                 Create a new secret
@@ -50,7 +50,7 @@
  * External dependencies.
  */
 import { useRoute } from 'vue-router';
-import { computed, ComputedRef, defineComponent, ref } from 'vue';
+import { computed, ComputedRef, defineComponent, ref, watch } from 'vue';
 
 /**
  * Internal dependencies.
@@ -71,10 +71,12 @@ export default defineComponent({
     const route = useRoute();
     const showSecret = ref(false);
     const secretId = route.params.secretId as SecretId;
+    const errorMessage = ref('');
     const { secret, isError, isLoading } = useFetchSecret({
       secretId,
       enabled: showSecret,
     });
+    const decryptedSecret = ref('');
     const cryptographyDetails: ComputedRef<{ secretKey: SecretCryptograhyKey; secretType: string }> = computed(() => {
       try {
         return JSON.parse(window.atob(route.hash.replace('#', '')));
@@ -82,19 +84,28 @@ export default defineComponent({
         return { secretKey: '', secretType: '' };
       }
     });
-    const decryptedSecret = computed(() => {
-      if (!secret.value) {
-        return undefined;
+    watch(isError, value => {
+      if (value) {
+        errorMessage.value = 'The secret has already been revealed!';
+      }
+    });
+    watch(secret, secretValue => {
+      if (!secretValue) {
+        return;
       }
 
-      return decrypt(cryptographyDetails.value.secretKey, secret.value);
+      try {
+        decryptedSecret.value = decrypt(cryptographyDetails.value.secretKey, secretValue);
+      } catch {
+        errorMessage.value = 'Cannot decrypt your secret! Please create a new secret and copy the full URL.';
+      }
     });
 
     return {
-      isError,
       secretId,
       isLoading,
       showSecret,
+      errorMessage,
       decryptedSecret,
     };
   },
