@@ -80,3 +80,7 @@ jobs:
           override: true
       - name: Linting
         run: make lint
+      - name: Build
+        run: ROCKET_PROFILE=release cargo build --release
+        env:
+          ROCKET_PROFILE: release
