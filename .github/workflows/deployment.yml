@@ -102,10 +102,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
+      - name: 'Authenticate Cloud'
+        uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: ${{ secrets.GCLOUD_CREDENTIAL_FILE }}
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v1'
 
       - name: 'Use gcloud CLI'
         run: 'gcloud config set project ${{ secrets.PROJECT_ID }} && gcloud auth configure-docker'
