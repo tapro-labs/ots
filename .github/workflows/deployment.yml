@@ -105,7 +105,7 @@ jobs:
       - name: 'Set up Cloud SDK'
         uses: 'google-github-actions/setup-gcloud@v1'
         with:
-          service_account_key: ${{ secrets.GCLOUD_CREDENTIAL_FILE }}
+          credentials_json: ${{ secrets.GCLOUD_CREDENTIAL_FILE }}
 
       - name: 'Use gcloud CLI'
         run: 'gcloud config set project ${{ secrets.PROJECT_ID }} && gcloud auth configure-docker'
