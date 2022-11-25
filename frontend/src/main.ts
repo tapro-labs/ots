@@ -13,6 +13,7 @@ import '@scss/main.scss';
 import Router from '@/Router';
 import App from './App.vue';
 
+// a comment to trigger deployment :rofl:
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
