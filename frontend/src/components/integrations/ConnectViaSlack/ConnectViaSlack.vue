@@ -15,6 +15,7 @@ import { defineComponent } from 'vue';
 /**
  * Internal dependencies.
  */
+import useConfig from '@/composables/useConfig';
 import SlackIcon from '@/components/icons/SlackIcon/SlackIcon.vue';
 
 export default defineComponent({
@@ -25,8 +26,8 @@ export default defineComponent({
   },
 
   setup() {
-    const connectOptions = import.meta.env.VITE_SLACK_CONNECT_QUERY_PARAMS;
-    const connectUrl = `https://slack.com/oauth/v2/authorize?${connectOptions}`;
+    const { slackConnectionParams } = useConfig();
+    const connectUrl = `https://slack.com/oauth/v2/authorize?${slackConnectionParams}`;
 
     return {
       connectUrl,

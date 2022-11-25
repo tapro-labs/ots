@@ -281,10 +281,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "dotenv"
-version = "0.15.0"
+name = "dotenvy"
+version = "0.15.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
+checksum = "03d8c417d7a8cb362e0c37e5d815f5eb7c37f79ff93707329d5a194e42e54ca0"
 
 [[package]]
 name = "either"
@@ -866,13 +866,13 @@ dependencies = [
 name = "ots_server"
 version = "0.1.0"
 dependencies = [
- "dotenv",
+ "dotenvy",
  "envconfig",
- "redis",
- "reqwest",
  "rocket",
  "serde",
- "uuid",
+ "slack",
+ "store",
+ "utils",
 ]
 
 [[package]]
@@ -1413,6 +1413,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "slack"
+version = "0.1.0"
+dependencies = [
+ "envconfig",
+ "reqwest",
+ "rocket",
+ "serde",
+ "store",
+ "utils",
+]
+
+[[package]]
 name = "smallvec"
 version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1456,6 +1468,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dbe866e1e51e8260c9eed836a042a5e7f6726bb2b411dffeaa712e19c388f23b"
 dependencies = [
  "loom",
+]
+
+[[package]]
+name = "store"
+version = "0.1.0"
+dependencies = [
+ "envconfig",
+ "redis",
+ "utils",
 ]
 
 [[package]]
@@ -1771,10 +1792,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "utils"
+version = "0.1.0"
+dependencies = [
+ "envconfig",
+ "rocket",
+ "serde",
+ "uuid",
+]
+
+[[package]]
 name = "uuid"
-version = "1.2.1"
+version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "feb41e78f93363bb2df8b0e86a2ca30eed7806ea16ea0c790d757cf93f79be83"
+checksum = "422ee0de9031b5b948b97a8fc04e3aa35230001a722ddd27943e0be31564ce4c"
 dependencies = [
  "getrandom",
 ]

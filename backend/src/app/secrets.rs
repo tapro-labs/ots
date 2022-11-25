@@ -1,8 +1,8 @@
-use crate::utils::{time::Time, uuid::Uuid};
 use rocket::response::status::BadRequest;
 use rocket::serde::{json::Json, Deserialize, Serialize};
+use utils::{time::Time, uuid::Uuid};
 
-use crate::store::redis_store::RedisStore;
+use store::redis_store::RedisStore;
 
 use rocket::{get, post, routes, Route};
 

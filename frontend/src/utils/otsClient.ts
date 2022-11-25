@@ -2,9 +2,10 @@
  * External dependencies.
  */
 import axios from 'axios';
+import Config from '@/utils/otsConfig';
 
 const otsClient = axios.create({
-  baseURL: import.meta.env.VITE_OTS_URL,
+  baseURL: Config.getInstance().backendUrl,
 });
 
 export default otsClient;

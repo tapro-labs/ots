@@ -1,15 +1,12 @@
 use rocket::http::Status;
-
 use rocket::response::Redirect;
 use rocket::serde::{json::Json, Deserialize};
 use rocket::{get, post, routes, Route};
+use utils::{global_options::GlobalOptions, logger};
 
-use crate::integrations::slack::auth::SlackAccessToken;
-use crate::integrations::slack::client::SlackFetchUsersResponse;
-use crate::integrations::slack::services::slack_authentication_service::{
-    authenticate, AuthenticationStatus,
-};
-use crate::{logger, GlobalOptions};
+use crate::auth::SlackAccessToken;
+use crate::client::SlackFetchUsersResponse;
+use crate::services::slack_authentication_service::{authenticate, AuthenticationStatus};
 
 use super::client::Client;
 

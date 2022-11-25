@@ -1,11 +1,12 @@
 use envconfig::Envconfig;
 use redis::ConnectionAddr::Tcp;
 use redis::{
-    Client, Commands, Connection, ConnectionInfo, FromRedisValue, RedisConnectionInfo, RedisResult,
-    ToRedisArgs,
+    Client, Commands, Connection, ConnectionInfo, FromRedisValue, RedisConnectionInfo,
+    RedisResult as RResult, ToRedisArgs,
 };
+use utils::time::Time;
 
-use crate::utils::time::Time;
+pub type RedisResult<T> = RResult<T>;
 
 #[derive(Envconfig)]
 pub struct RedisConfig {

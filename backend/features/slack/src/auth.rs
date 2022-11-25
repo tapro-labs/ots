@@ -1,13 +1,9 @@
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
 use rocket::{async_trait, Request};
+use store::redis_store::RedisStore;
 
-use crate::integrations::slack::auth::AccessTokenError::{Invalid, Missing};
-
-use crate::integrations::slack::services::slack_authentication_service::{
-    refresh_token, AuthenticationStatus,
-};
-use crate::store::redis_store::RedisStore;
+use crate::services::slack_authentication_service::{refresh_token, AuthenticationStatus};
 
 #[derive(Debug)]
 pub enum AccessTokenError {
@@ -29,7 +25,7 @@ impl<'r> FromRequest<'r> for SlackAccessToken {
         match authorization {
             Some(authorization) => {
                 if !authorization.contains("Bearer") {
-                    return Outcome::Failure((Status::Unauthorized, Missing));
+                    return Outcome::Failure((Status::Unauthorized, AccessTokenError::Missing));
                 }
 
                 let id: &str = authorization
@@ -57,9 +53,9 @@ impl<'r> FromRequest<'r> for SlackAccessToken {
                     }
                 }
 
-                Outcome::Failure((Status::Unauthorized, Invalid))
+                Outcome::Failure((Status::Unauthorized, AccessTokenError::Invalid))
             }
-            _ => Outcome::Failure((Status::Unauthorized, Missing)),
+            _ => Outcome::Failure((Status::Unauthorized, AccessTokenError::Missing)),
         }
     }
 }

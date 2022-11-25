@@ -4,10 +4,10 @@ use envconfig::Envconfig;
 use reqwest::Error as ReqwestError;
 use rocket::http::Status;
 use rocket::serde::{json::serde_json, json::Value, Deserialize, Serialize};
+use utils::global_options::GlobalOptions;
+use utils::logger;
 
-use crate::integrations::slack::member::Member;
-use crate::utils::logger;
-use crate::GlobalOptions;
+use crate::member::Member;
 
 pub enum SlackRequestError {
     BadRequest,

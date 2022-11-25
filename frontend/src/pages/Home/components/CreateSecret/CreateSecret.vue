@@ -17,7 +17,7 @@
     </div>
 
     <div class="card-actions flex justify-between">
-      <div class="flex justify-center">
+      <div v-if="isSlackFeatureEnabled" class="flex justify-center">
         <select-create-method @change="createMethod = $event" />
 
         <select-slack-user v-if="isSlackCreateMethod" class="ml-4" @change="onSlackUserSelected" />
@@ -52,6 +52,7 @@ import useSendMessage from '@/composables/integrations/slack/useSendMessage';
 import { SlackUser } from '@/composables/integrations/slack/useFetchUsers';
 import { SecretCreateMethod } from '@/enums/SecretCreateMethod';
 import { createRandomSecret, DEFAULT_SECRET_LENGTH, encrypt } from '@/utils/cryptography';
+import useConfig from '@/composables/useConfig';
 
 export default defineComponent({
   name: 'CreateSecret',
@@ -68,6 +69,7 @@ export default defineComponent({
   },
 
   setup(_, { emit }) {
+    const { isSlackFeatureEnabled } = useConfig();
     const { apiToken } = useApiToken();
     const createMethod = ref(SecretCreateMethod.COPY);
     const selectedSlackUser: Ref<SlackUser | null> = ref(null);
@@ -133,6 +135,7 @@ export default defineComponent({
       isButtonDisabled,
       selectedSlackUser,
       onSlackUserSelected,
+      isSlackFeatureEnabled,
       isLoading: computed(() => isCreating.value || isSending.value),
       isSlackCreateMethod: computed(() => createMethod.value === SecretCreateMethod.SLACK),
     };

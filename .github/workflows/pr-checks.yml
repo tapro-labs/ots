@@ -4,6 +4,7 @@ on:
     types:
       - opened
       - reopened
+      - synchronize
 
 jobs:
   # JOB to run change detection
@@ -76,11 +77,12 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: 1.62.1
+          toolchain: 1.65
           override: true
       - name: Linting
         run: make lint
       - name: Build
-        run: ROCKET_PROFILE=release cargo build --release
+        run: make build
         env:
           ROCKET_PROFILE: release
+          ENABLED_FEATURES: ${{ secrets.ENABLED_FEATURES }}

@@ -1,11 +1,10 @@
-use redis::RedisResult;
 use rocket::http::Status;
+use store::redis_store::{RedisResult, RedisStore};
+use utils::logger;
+use utils::time::Time;
+use utils::uuid::Uuid;
 
-use crate::integrations::slack::client::{Client, SlackAccessTokenResponse, SlackRequestError};
-use crate::logger;
-use crate::store::redis_store::RedisStore;
-use crate::utils::time::Time;
-use crate::utils::uuid::Uuid;
+use crate::client::{Client, SlackAccessTokenResponse, SlackRequestError};
 
 type SessionId = String;
 

@@ -1,15 +1,33 @@
 [package]
 name = "ots_server"
+build = "build.rs"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+slack = { path = "./features/slack", optional = true }
+utils = { workspace = true }
+store = { workspace = true }
+rocket = { workspace = true }
+serde = { workspace = true }
+envconfig = { workspace = true }
+
+[build-dependencies]
+dotenvy = { version = "0.15.6" }
+
+[workspace]
+members = ["features/*", "lib/*"]
+
+[workspace.dependencies]
+store = { path = "./lib/store" }
+utils = { path = "./lib/utils" }
 rocket = { version = "0.5.0-rc.2", features = ["secrets", "json", "tls"] }
-redis = "0.22"
 serde = { version = "1.0", features = ["derive"] }
 uuid = { version = "1.2", features = ["v4"] }
-envconfig = "0.10"
 reqwest = { version = "0.11", features = ["blocking", "json"] }
-dotenv = "0.15.0"
+envconfig = { version = "0.10" }
+
+[features]
+slack_feature = ["slack"]
