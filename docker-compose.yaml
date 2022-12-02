@@ -43,7 +43,7 @@ services:
       - workspace
     ports:
       - "9010:3000"
-    command: bash -c "yarn --cache-folder=/tmp/.local-yarn-cache && cd ./frontend && cp .env.docker .env && yarn dev"
+    command: bash -c "yarn --cache-folder=/tmp/.local-yarn-cache && cd ./frontend && (test -f .env || cp .env.docker .env) && yarn dev"
     working_dir: /app
     volumes:
       - .:/app
