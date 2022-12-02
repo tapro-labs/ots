@@ -8,4 +8,4 @@ RUN cargo install cargo-watch
 
 EXPOSE 8000
 
-CMD ["/bin/bash", "-c", "(test -f .env.docker || cp.env.docker .env) && make dev"]
+CMD ["/bin/bash", "-c", "(test -f .env || cp.env.docker .env) && make dev"]
