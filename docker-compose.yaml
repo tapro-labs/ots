@@ -9,6 +9,8 @@ volumes:
     driver: local
   rust_cache:
     driver: local
+  yarn_cache:
+    driver: local
 
 services:
   redis:
@@ -16,7 +18,7 @@ services:
     networks:
       - backend
     ports:
-      - 9015:6379
+      - "9015:6379"
     volumes:
       - redis:/data
 
@@ -29,20 +31,24 @@ services:
     networks:
       - backend
     ports:
-      - 9011:8000
+      - "9011:8000"
     volumes:
       - ./backend:/app
+      - /app/.env
       - rust_cache:/usr/local/cargo
 
   frontend:
     image: node:14.21.1
     depends_on:
       - workspace
-    environment:
-      IN_DOCKER: 'yes'
     ports:
-      - 9010:3000
-    command: bash -c "yarn && yarn dev"
+      - "9010:3000"
+    command: bash -c "yarn --cache-folder=/tmp/.local-yarn-cache && cd ./frontend && cp .env.docker .env && yarn dev"
     working_dir: /app
     volumes:
-      - ./frontend:/app
+      - .:/app
+      - yarn_cache:/tmp/.local-yarn-cache
+      - /app/frontend/.env
+      - /app/node_modules
+      - /app/backend
+      - /app/frontend/node_modules

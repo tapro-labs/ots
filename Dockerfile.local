@@ -5,6 +5,7 @@ LABEL maintainer "Tapro Labs <kontakt@taprolabs.de>"
 WORKDIR /app
 
 RUN cargo install cargo-watch
+RUN cp .env.docker .env
 
 EXPOSE 8000
 
