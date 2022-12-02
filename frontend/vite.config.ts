@@ -57,7 +57,7 @@ const getHttpsOptions = () => {
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    open: true,
+    open: process.env.IN_DOCKER !== 'yes',
     port: 3000,
     host: process.env.IN_DOCKER === 'yes' ? '0.0.0.0' : 'localhost',
     https: getHttpsOptions(),
