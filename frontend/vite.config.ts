@@ -18,12 +18,6 @@ import vue from '@vitejs/plugin-vue';
  */
 dns.setDefaultResultOrder('verbatim');
 
-declare var process: {
-  env: {
-    IN_DOCKER?: 'yes';
-  };
-};
-
 type TSConfig = {
   compilerOptions: {
     paths: { [key: string]: string[] };
@@ -54,12 +48,14 @@ const getHttpsOptions = () => {
   }
 };
 
+const isDockerEnv = fs.existsSync(path.resolve('/.dockerenv'));
+
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    open: process.env.IN_DOCKER !== 'yes',
+    open: isDockerEnv,
     port: 3000,
-    host: process.env.IN_DOCKER === 'yes' ? '0.0.0.0' : 'localhost',
+    host: isDockerEnv ? '0.0.0.0' : 'localhost',
     https: getHttpsOptions(),
   },
   plugins: [vue()],
