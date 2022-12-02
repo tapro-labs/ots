@@ -6,9 +6,7 @@ WORKDIR /app
 
 RUN cargo install cargo-watch
 
-# copy .env.docker only when we do not have .env
-RUN test -f .env || cp .env.docker .env
-
 EXPOSE 8000
 
-CMD ["make", "dev"]
+
+CMD ["/bin/bash", "-c", "(test -f .env.docker || cp.env.docker .env) && make dev"]

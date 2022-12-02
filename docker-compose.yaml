@@ -34,7 +34,6 @@ services:
       - "9011:8000"
     volumes:
       - ./backend:/app
-      - /app/.env
       - rust_cache:/usr/local/cargo
 
   frontend:
@@ -48,7 +47,6 @@ services:
     volumes:
       - .:/app
       - yarn_cache:/tmp/.local-yarn-cache
-      - /app/frontend/.env
       - /app/node_modules
       - /app/backend
       - /app/frontend/node_modules
