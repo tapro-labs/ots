@@ -48,14 +48,14 @@ const getHttpsOptions = () => {
   }
 };
 
-const isDockerEnv = fs.existsSync(path.resolve('/.dockerenv'));
+const inADockerContainer = fs.existsSync(path.resolve('/.dockerenv'));
 
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    open: !isDockerEnv,
+    open: !inADockerContainer,
     port: 3000,
-    host: isDockerEnv ? '0.0.0.0' : 'localhost',
+    host: inADockerContainer ? '0.0.0.0' : 'localhost',
     https: getHttpsOptions(),
   },
   plugins: [vue()],

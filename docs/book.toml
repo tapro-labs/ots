@@ -1,0 +1,6 @@
+[book]
+authors = ["Tapro Labs"]
+language = "en"
+multilingual = false
+src = "src"
+title = "One Time Secret (OTS) documentation"

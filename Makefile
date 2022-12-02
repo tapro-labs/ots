@@ -18,3 +18,6 @@ stop_docker:
 
 generate_ssl:
 	./server_ssl/generate-ssl.sh
+
+see_docs:
+	cd docs && mdbook serve --open -p 9050
