@@ -4,6 +4,7 @@ LABEL maintainer "Tapro Labs <kontakt@taprolabs.de>"
 
 WORKDIR /app
 
+COPY ./backend/rust-toolchain.toml .
 RUN cargo install cargo-watch
 
 EXPOSE 8000
