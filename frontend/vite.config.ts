@@ -53,7 +53,7 @@ const isDockerEnv = fs.existsSync(path.resolve('/.dockerenv'));
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    open: isDockerEnv,
+    open: !isDockerEnv,
     port: 3000,
     host: isDockerEnv ? '0.0.0.0' : 'localhost',
     https: getHttpsOptions(),
