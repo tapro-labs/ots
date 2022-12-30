@@ -13,6 +13,7 @@ import '@scss/main.scss';
 import Router from '@/Router';
 import App from './App.vue';
 
+// test comment
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
