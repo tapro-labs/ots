@@ -2,6 +2,7 @@ export interface OtsConfig {
   backendUrl: string;
   isSlackFeatureEnabled: boolean;
   slackConnectionParams: string;
+  encryptionByteSize: number;
 }
 
 class Config implements OtsConfig {
@@ -23,6 +24,10 @@ class Config implements OtsConfig {
 
   get backendUrl() {
     return import.meta.env.VITE_OTS_URL;
+  }
+
+  get encryptionByteSize() {
+    return 1024 * 16; // encrypt 16kb at a time
   }
 
   static getInstance() {

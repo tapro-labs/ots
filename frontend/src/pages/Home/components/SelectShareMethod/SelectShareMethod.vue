@@ -1,7 +1,7 @@
 <template>
   <div class="form-control">
     <label :for="inputId" class="label">
-      <span class="label-text">Select create secret method</span>
+      <span class="label-text">Select share method</span>
     </label>
 
     <select :id="inputId" v-model="type" class="select select-bordered w-full max-w-xs">
@@ -20,27 +20,27 @@ import { defineComponent, ref, watch } from 'vue';
 /**
  * Internal dependencies.
  */
-import { SecretCreateMethod } from '@/enums/SecretCreateMethod';
+import { ShareMethod } from '@/enums/ShareMethod';
 
 export default defineComponent({
-  name: 'SelectCreateMethod',
+  name: 'SelectShareMethod',
 
   emits: {
-    change(_type: SecretCreateMethod) {
+    change(_type: ShareMethod) {
       return true;
     },
   },
 
   setup(_, { emit }) {
     const inputId = nanoid();
-    const type = ref(SecretCreateMethod.COPY);
+    const type = ref(ShareMethod.COPY);
     const options = [
       {
-        value: SecretCreateMethod.COPY,
+        value: ShareMethod.COPY,
         label: 'Copy Link',
       },
       {
-        value: SecretCreateMethod.SLACK,
+        value: ShareMethod.SLACK,
         label: 'Sending via Slack',
       },
     ];

@@ -2,23 +2,29 @@
   <div class="prose max-w-full">
     <h3 class="card-title">Create a secret below</h3>
 
-    <div class="form-control mt-2 mb-4">
-      <textarea
-        v-model="secret"
-        :class="{ 'textarea-error': hasError }"
-        autofocus
-        class="secret-textarea textarea w-full textarea-bordered"
-        placeholder="Secret here"
-      />
+    <file-input max-size="40MB" @error="onFileError" @file="onFile">
+      <div v-if="!fileInfo" class="form-control mt-2 mb-4">
+        <textarea
+          v-model="secret"
+          :class="{ 'textarea-error': hasError }"
+          autofocus
+          class="secret-textarea textarea w-full textarea-bordered"
+          placeholder="Secret here"
+        />
 
-      <label v-if="hasError" class="label">
-        <span class="text-error label-text-alt">Secret must not be empty!</span>
-      </label>
-    </div>
+        <label v-if="hasError" class="label">
+          <span class="text-error label-text-alt">Secret must not be empty!</span>
+        </label>
+      </div>
+
+      <div v-else class="form-control mt-2 mb-4">
+        You have uploaded a file: <strong>{{ fileInfo.name }}</strong>
+      </div>
+    </file-input>
 
     <div class="card-actions flex justify-between">
       <div v-if="isSlackFeatureEnabled" class="flex justify-center">
-        <select-create-method @change="createMethod = $event" />
+        <select-share-method @change="createMethod = $event" />
 
         <select-slack-user v-if="isSlackCreateMethod" class="ml-4" @change="onSlackUserSelected" />
       </div>
@@ -45,69 +51,97 @@ import { computed, defineComponent, Ref, ref, watch } from 'vue';
  * Internal dependencies.
  */
 import useCreateSecret from '@/composables/useCreateSecret';
-import SelectCreateMethod from '@/pages/Home/components/SelectCreateMethod/SelectCreateMethod.vue';
 import SelectSlackUser from '@/pages/Home/components/SelectSlackUser/SelectSlackUser.vue';
 import useApiToken from '@/composables/integrations/slack/useApiToken';
 import useSendMessage from '@/composables/integrations/slack/useSendMessage';
 import { SlackUser } from '@/composables/integrations/slack/useFetchUsers';
-import { SecretCreateMethod } from '@/enums/SecretCreateMethod';
-import { createRandomSecret, DEFAULT_SECRET_LENGTH, encrypt } from '@/utils/cryptography';
+import { ShareMethod } from '@/enums/ShareMethod';
+import { createRandomSecret, DEFAULT_SECRET_LENGTH } from '@/utils/cryptography';
 import useConfig from '@/composables/useConfig';
+import SelectShareMethod from '@/pages/Home/components/SelectShareMethod/SelectShareMethod.vue';
+import FileInput from '@/components/FileInput/FileInput.vue';
+import FileTooLargeError from '@/exceptions/FileTooLargeError';
+import useNotifications from '@/composables/useNotifications';
+import { SecretInfo } from '@/types/SecretInfo';
+import { FileInfo } from '@/types/FileInfo';
 
 export default defineComponent({
   name: 'CreateSecret',
 
   components: {
+    FileInput,
     SelectSlackUser,
-    SelectCreateMethod,
+    SelectShareMethod,
   },
 
   emits: {
-    created(_payload: { secretUrl: string; createMethod: SecretCreateMethod }) {
+    created(_payload: { secretUrl: string; createMethod: ShareMethod }) {
       return true;
     },
   },
 
   setup(_, { emit }) {
+    let stream: ReadableStream<Uint8Array> | null = null;
+    // temporary variable to at least show a spinner while encrypting large files
+    const isLoading = ref(false);
     const { isSlackFeatureEnabled } = useConfig();
     const { apiToken } = useApiToken();
-    const createMethod = ref(SecretCreateMethod.COPY);
+    const createMethod = ref(ShareMethod.COPY);
     const selectedSlackUser: Ref<SlackUser | null> = ref(null);
     const hasError = ref(false);
     const secret = ref('');
-    const isSlackCreateMethod = computed(() => createMethod.value === SecretCreateMethod.SLACK);
+    const fileInfo: Ref<FileInfo | null> = ref(null);
+    const isSlackCreateMethod = computed(() => createMethod.value === ShareMethod.SLACK);
     const { createSecret, isCreating } = useCreateSecret();
     const { isSending, sendMessage } = useSendMessage();
+    const { setErrorMessage } = useNotifications();
     const onCreateSecret = async () => {
-      if (!secret.value) {
+      if (!stream) {
         hasError.value = true;
 
         return;
       }
 
-      if (isCreating.value || isSending.value) {
+      if (isCreating.value || isSending.value || isLoading.value) {
         return;
       }
 
-      const secretKey = await createRandomSecret(DEFAULT_SECRET_LENGTH);
-      const secretId = await createSecret({ secret: encrypt(secretKey, secret.value) });
-      const cryptograhyDetails = window.btoa(JSON.stringify({ secretKey, secretType: 'plain' }));
-      const secretUrl = window.location.origin + '/secret/' + secretId + '#' + cryptograhyDetails;
+      try {
+        isLoading.value = true;
 
-      if (isSlackCreateMethod.value && selectedSlackUser?.value?.id) {
-        await sendMessage({
-          channelId: selectedSlackUser.value.id,
-          message: `Secret: ${secretUrl}`,
+        let secretInfo: SecretInfo = {
+          type: 'plain',
+        };
+
+        if (fileInfo.value) {
+          secretInfo = {
+            type: 'file',
+            info: fileInfo.value,
+          };
+        }
+
+        const secretKey = await createRandomSecret(DEFAULT_SECRET_LENGTH);
+        const secretId = await createSecret({ data: stream, key: secretKey });
+        const cryptograhyDetails = window.btoa(JSON.stringify({ secretKey, secretInfo }));
+        const secretUrl = window.location.origin + '/secret/' + secretId + '#' + cryptograhyDetails;
+
+        if (isSlackCreateMethod.value && selectedSlackUser?.value?.id) {
+          await sendMessage({
+            channelId: selectedSlackUser.value.id,
+            message: `Secret: ${secretUrl}`,
+          });
+        }
+
+        // reset secret
+        secret.value = '';
+
+        emit('created', {
+          secretUrl,
+          createMethod: createMethod.value,
         });
+      } catch {
+        isLoading.value = false;
       }
-
-      // reset secret
-      secret.value = '';
-
-      emit('created', {
-        secretUrl,
-        createMethod: createMethod.value,
-      });
     };
     const isButtonDisabled = computed(() => {
       if (createMethod.value !== 'slack') {
@@ -121,23 +155,47 @@ export default defineComponent({
       selectedSlackUser.value = { ...user };
     };
 
+    const onFile = async (file: File) => {
+      stream = file.stream();
+      fileInfo.value = {
+        name: file.name,
+        type: file.type,
+      };
+    };
+    const onFileError = (error: FileTooLargeError) => {
+      setErrorMessage({ message: 'File is larger than 40MB' });
+    };
+
     watch(secret, newValue => {
       if (!newValue) {
         hasError.value = true;
+
+        return;
       }
+
+      fileInfo.value = null;
+      stream = new ReadableStream({
+        pull(controller) {
+          controller.enqueue(Uint8Array.from(newValue.split('').map(x => x.charCodeAt(0))));
+          controller.close();
+        },
+      });
     });
 
     return {
       secret,
       createMethod,
       hasError,
+      onFile,
+      fileInfo,
+      onFileError,
       onCreateSecret,
       isButtonDisabled,
       selectedSlackUser,
       onSlackUserSelected,
       isSlackFeatureEnabled,
-      isLoading: computed(() => isCreating.value || isSending.value),
-      isSlackCreateMethod: computed(() => createMethod.value === SecretCreateMethod.SLACK),
+      isLoading: computed(() => isCreating.value || isSending.value || isLoading.value),
+      isSlackCreateMethod: computed(() => createMethod.value === ShareMethod.SLACK),
     };
   },
 });

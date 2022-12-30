@@ -38,7 +38,7 @@ import { computed, defineComponent, ref } from 'vue';
 import TheHeader from '@/components/TheHeader/TheHeader.vue';
 import CreateSecret from '@/pages/Home/components/CreateSecret/CreateSecret.vue';
 import CopySecret from '@/pages/Home/components/CopySecret/CopySecret.vue';
-import { SecretCreateMethod } from '@/enums/SecretCreateMethod';
+import { ShareMethod } from '@/enums/ShareMethod';
 
 export default defineComponent({
   components: {
@@ -49,12 +49,12 @@ export default defineComponent({
 
   setup() {
     const secretUrl = ref('');
-    const createMethod = ref(SecretCreateMethod.COPY);
-    const onCreated = (payload: { secretUrl: string; createMethod: SecretCreateMethod }) => {
+    const createMethod = ref(ShareMethod.COPY);
+    const onCreated = (payload: { secretUrl: string; createMethod: ShareMethod }) => {
       secretUrl.value = payload.secretUrl;
       createMethod.value = payload.createMethod;
     };
-    const isSlackCreateMethod = computed(() => createMethod.value === SecretCreateMethod.SLACK);
+    const isSlackCreateMethod = computed(() => createMethod.value === ShareMethod.SLACK);
 
     return {
       secretUrl,

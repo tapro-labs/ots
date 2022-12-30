@@ -18,7 +18,12 @@
 
             <template v-else-if="showSecret && !isLoading">
               <div class="form-control mb-4">
-                <textarea :value="decryptedSecret" class="textarea reveal-secret-textarea textarea-disabled" disabled />
+                <textarea
+                  v-if="!isFile"
+                  :value="decryptedSecret"
+                  class="textarea reveal-secret-textarea textarea-disabled"
+                  disabled
+                />
 
                 <label class="label">
                   <span class="text-info font-bold label-text-alt">
@@ -31,6 +36,10 @@
 
             <template v-else>
               <p>Click the button to reveal secret</p>
+
+              <p v-if="isFile && isLoading">
+                It seems someone has sent you a file 😁. Please be patient while the file is being fetched!
+              </p>
 
               <div class="card-actions justify-end">
                 <button :class="{ loading: isLoading }" class="btn btn-primary" @click="showSecret = true">
@@ -58,7 +67,11 @@ import { computed, ComputedRef, defineComponent, ref, watch } from 'vue';
 import { SecretId } from '@/types/SecretTypes';
 import useFetchSecret from '@/composables/useFetchSecret';
 import TheHeader from '@/components/TheHeader/TheHeader.vue';
-import { decrypt, SecretCryptograhyKey } from '@/utils/cryptography';
+import { SecretCryptograhyKey } from '@/utils/cryptography';
+import useDecryptData from '@/composables/useDecryptData';
+import EncryptStreamTransformer from '@/stream-transformers/EncryptStreamTransformer';
+import GenericStreamTransformation from '@/stream-transformers/GenericStreamTransformation';
+import { base64ToUint8Array } from '@/utils/helpers';
 
 export default defineComponent({
   name: 'Secret',
@@ -69,6 +82,7 @@ export default defineComponent({
 
   setup() {
     const route = useRoute();
+    const { decryptStream } = useDecryptData();
     const showSecret = ref(false);
     const secretId = route.params.secretId as SecretId;
     const errorMessage = ref('');
@@ -77,31 +91,95 @@ export default defineComponent({
       enabled: showSecret,
     });
     const decryptedSecret = ref('');
-    const cryptographyDetails: ComputedRef<{ secretKey: SecretCryptograhyKey; secretType: string }> = computed(() => {
+    const cryptographyDetails: ComputedRef<{
+      secretKey: SecretCryptograhyKey;
+      secretInfo: { type: string; info?: any };
+    }> = computed(() => {
       try {
         return JSON.parse(window.atob(route.hash.replace('#', '')));
       } catch (a) {
-        return { secretKey: '', secretType: '' };
+        return { secretKey: '', secretInfo: { type: 'plain' } };
       }
     });
+    const downloadFile = async (stream: ReadableStream, info: { type: string; name: string }) => {
+      const chunks = [];
+      const reader = stream.pipeThrough(new GenericStreamTransformation(base64ToUint8Array)).getReader();
+      let read: any;
+
+      do {
+        read = await reader.read();
+
+        if (read.value) {
+          chunks.push(read.value);
+        }
+      } while (!read.done);
+
+      const blob = new Blob(chunks, { type: info.type });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', info.name);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    };
+
     watch(isError, value => {
       if (value) {
         errorMessage.value = 'The secret has already been revealed!';
       }
     });
-    watch(secret, secretValue => {
+    watch(secret, async secretValue => {
       if (!secretValue) {
         return;
       }
 
+      const secretStream = new ReadableStream({
+        pull(controller) {
+          const separatorIndex = (secretValue as string).indexOf(EncryptStreamTransformer.SEPARATOR);
+          const value = (secretValue as string).slice(0, separatorIndex);
+          secretValue = (secretValue as string).slice(separatorIndex + EncryptStreamTransformer.SEPARATOR.length);
+
+          controller.enqueue(value);
+
+          if (!secretValue.length) {
+            controller.close();
+          }
+        },
+      });
+
       try {
-        decryptedSecret.value = decrypt(cryptographyDetails.value.secretKey, secretValue);
-      } catch {
+        const stream = decryptStream({
+          key: cryptographyDetails.value.secretKey,
+          data: secretStream,
+        });
+
+        if (cryptographyDetails.value.secretInfo.type === 'plain') {
+          let secretData = '';
+          const reader = stream.pipeThrough(new GenericStreamTransformation(window.atob)).getReader();
+          let read: any;
+
+          do {
+            read = await reader.read();
+
+            if (read.value) {
+              secretData += read.value;
+            }
+          } while (!read.done);
+
+          decryptedSecret.value = secretData;
+        } else if (cryptographyDetails.value.secretInfo.type === 'file') {
+          await downloadFile(stream, cryptographyDetails.value.secretInfo.info);
+        }
+      } catch (e) {
         errorMessage.value = 'Cannot decrypt your secret! Please create a new secret and copy the full URL.';
       }
     });
+    const isFile = computed(() => cryptographyDetails.value?.secretInfo?.type === 'file');
 
     return {
+      isFile,
       secretId,
       isLoading,
       showSecret,

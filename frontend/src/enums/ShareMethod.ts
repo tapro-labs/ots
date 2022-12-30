@@ -1,4 +1,4 @@
-export enum SecretCreateMethod {
+export enum ShareMethod {
   COPY = 'copy',
   SLACK = 'slack',
 }
