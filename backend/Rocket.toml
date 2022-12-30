@@ -2,8 +2,8 @@
 address = "127.0.0.1"
 port = 8000
 keep_alive = 5
-read_timeout = 5
-write_timeout = 5
+read_timeout = 300
+write_timeout = 300
 # we allow for 40mb uploads in the frontend
 # the encrypted data has an increase in size (244%) or ratio (2,449275362318841)
 # therefore the end size of a 40 mb file is about 97.971MB.
