@@ -64,7 +64,7 @@ export default defineComponent({
     };
 
     watch(
-      users,
+      nonBotUsers,
       (newValue, oldValue) => {
         // if we do not have new users, then do nothing
         // if we had users before, then do nothing
