@@ -52,6 +52,8 @@ jobs:
 
   build_backend:
     needs: changes
+    env:
+      OTS_BUILD_VERSION: v{{ github.run_number }}
     if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-20.04
     defaults:

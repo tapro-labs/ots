@@ -7,6 +7,9 @@ pub struct GlobalOptions {
 
     #[envconfig(from = "BACKEND_SERVER_URL", default = "")]
     pub backend_server_url: String,
+
+    #[envconfig(from = "OTS_BUILD_VERSION", default = "0.0.0")]
+    pub build_version: String,
 }
 
 impl Default for GlobalOptions {
