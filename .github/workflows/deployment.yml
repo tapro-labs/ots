@@ -100,6 +100,7 @@ jobs:
       DOCKER_IMAGE_PREFIX: eu.gcr.io/tapro-labs/ots
       DOCKER_BACKEND_IMAGE: eu.gcr.io/tapro-labs/ots/ots-backend
       DOCKER_FRONTEND_IMAGE: eu.gcr.io/tapro-labs/ots/ots-frontend
+      DOCKER_TAG_NAME: ots-deployment-${{ github.run_number }}
     steps:
       - uses: actions/checkout@v3
 
@@ -155,17 +156,17 @@ jobs:
 
       - name: 'Tag and push backend docker image'
         run: |
-          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}:production ${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.run_number }}
+          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}:production ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
           docker push ${{ env.DOCKER_BACKEND_IMAGE }}:production
-          docker push ${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.run_number }}
+          docker push ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
 
       - name: 'Tag and push frontend docker image'
         run: |
-          docker tag ${{ env.DOCKER_FRONTEND_IMAGE }}:production ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.run_number }}
+          docker tag ${{ env.DOCKER_FRONTEND_IMAGE }}:production ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
           docker push ${{ env.DOCKER_FRONTEND_IMAGE }}:production
-          docker push ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.run_number }}
+          docker push ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
 
       - name: 'Deploy'
         run: |
-          kubectl set image deployment/ots-backend -n ${{ env.DEPLOYMENT_NAMESPACE }} ots-backend=${{ env.DOCKER_BACKEND_IMAGE }}:${{ github.run_number }}
-          kubectl set image deployment/ots-frontend -n ${{ env.DEPLOYMENT_NAMESPACE }} ots-frontend=${{ env.DOCKER_FRONTEND_IMAGE }}:${{ github.run_number }}
+          kubectl set image deployment/ots-backend -n ${{ env.DEPLOYMENT_NAMESPACE }} ots-backend=${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
+          kubectl set image deployment/ots-frontend -n ${{ env.DEPLOYMENT_NAMESPACE }} ots-frontend=${{ env.DOCKER_FRONTEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
