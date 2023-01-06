@@ -16,6 +16,10 @@ fn main() {
         }
     }
 
+    if let Ok(version) = env::var("OTS_BUILD_VERSION") {
+        println!("cargo:rustc-env=OTS_BUILD_VERSION={}", version);
+    }
+
     if let Ok(profile) = env::var("ROCKET_PROFILE") {
         if profile != "debug" {
             return;

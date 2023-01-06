@@ -17,6 +17,7 @@ async fn main() {
         server = utils::cors::init_rocket_module(server);
     }
 
+    server = utils::versioning::init_rocket_module(server);
     server = integrations::init_routes(server);
     server = app::init_routes(server);
 
