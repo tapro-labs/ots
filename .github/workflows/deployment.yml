@@ -52,8 +52,6 @@ jobs:
 
   build_backend:
     needs: changes
-    env:
-      OTS_BUILD_VERSION: v{{ github.run_number }}
     if: ${{ needs.changes.outputs.backend == 'true' }}
     runs-on: ubuntu-20.04
     defaults:
@@ -80,6 +78,7 @@ jobs:
         run: make build
         env:
           ROCKET_PROFILE: release
+          OTS_BUILD_VERSION: v{{ github.run_number }}
           ENABLED_FEATURES: ${{ secrets.ENABLED_FEATURES }}
       - name: Archive binary
         uses: actions/upload-artifact@v3
