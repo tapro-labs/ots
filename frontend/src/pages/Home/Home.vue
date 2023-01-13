@@ -7,7 +7,7 @@
         <div class="card-body">
           <template v-if="secretUrl">
             <slack-send-secret-personalisation
-              v-if="isSlackCreateMethod"
+              v-if="isSlackCreateMethod && createMethodData"
               :data="createMethodData"
               :secret-url="secretUrl"
             />

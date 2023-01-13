@@ -22,7 +22,12 @@
       <div class="brn-group flex self-end">
         <button :disabled="isSending" class="btn btn-secondary mr-2" @click="proceed">Proceed without a message</button>
 
-        <button :class="{ loading: isSending }" :disabled="isSending" class="btn btn-primary" @click="sendSlackMessage">
+        <button
+          :class="{ loading: isSending }"
+          :disabled="isSending"
+          class="btn btn-primary"
+          @click="sendSlackMessage(true)"
+        >
           Send
         </button>
       </div>
@@ -88,7 +93,6 @@ export default defineComponent({
     const proceed = async () => {
       initPersonalizedMessage();
       await sendSlackMessage(false);
-      hasPersonalized.value = true;
     };
     const validate = () => {
       if (!slackPersonalizedMessage.value.includes(secretUrl.value)) {
@@ -113,6 +117,8 @@ export default defineComponent({
           message,
           channelId: data.value.channelId,
         });
+
+        hasPersonalized.value = true;
       } catch (e) {
         setErrorMessage({ message: 'Failed to send message to slack!' });
         throw e;
