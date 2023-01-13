@@ -5,8 +5,8 @@
 @import './notifier';
 @import './droppable';
 
-* {
-  box-sizing: content-box;
+.big-textarea {
+  min-height: 12rem !important;
 }
 
 /* ------------------------------------------------------------ *\

@@ -8,7 +8,7 @@
           v-model="secret"
           :class="{ 'textarea-error': hasError }"
           autofocus
-          class="secret-textarea textarea w-full textarea-bordered droppable-indicator"
+          class="big-textarea textarea w-full textarea-bordered droppable-indicator"
           placeholder="Secret here"
         />
 
@@ -63,6 +63,9 @@ import FileInput from '@/components/FileInput/FileInput.vue';
 import useNotifications from '@/composables/useNotifications';
 import { SecretInfo } from '@/types/SecretInfo';
 import { FileInfo } from '@/types/FileInfo';
+import { CreateMethodData } from '@/types/CreateMethodData';
+
+export type CreatedEventPayload = { secretUrl: string; createMethod: ShareMethod; createMethodData?: CreateMethodData };
 
 export default defineComponent({
   name: 'CreateSecret',
@@ -74,7 +77,7 @@ export default defineComponent({
   },
 
   emits: {
-    created(_payload: { secretUrl: string; createMethod: ShareMethod }) {
+    created(_payload: CreatedEventPayload) {
       return true;
     },
   },
@@ -124,15 +127,20 @@ export default defineComponent({
         const cryptograhyDetails = window.btoa(JSON.stringify({ secretKey, secretInfo }));
         const secretUrl = window.location.origin + '/secret/' + secretId + '#' + cryptograhyDetails;
 
-        if (isSlackCreateMethod.value && selectedSlackUser?.value?.id) {
-          await sendMessage({
-            channelId: selectedSlackUser.value.id,
-            message: `Secret: ${secretUrl}`,
-          });
-        }
-
         // reset secret
         secret.value = '';
+
+        if (isSlackCreateMethod.value && selectedSlackUser?.value?.id) {
+          emit('created', {
+            secretUrl,
+            createMethod: createMethod.value,
+            createMethodData: {
+              channelId: selectedSlackUser.value.id,
+            },
+          });
+
+          return;
+        }
 
         emit('created', {
           secretUrl,
@@ -199,9 +207,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.secret-textarea {
-  min-height: 12rem;
-}
-</style>

@@ -6,15 +6,11 @@
       <div class="card w-full bg-base-100 shadow-xl">
         <div class="card-body">
           <template v-if="secretUrl">
-            <div v-if="isSlackCreateMethod" class="flex flex-col">
-              <div class="mb-4">
-                <p>Secret sent successfully to Slack</p>
-              </div>
-
-              <div class="flex self-end">
-                <button class="btn btn-primary" @click="secretUrl = ''">Send another secret</button>
-              </div>
-            </div>
+            <slack-send-secret-personalisation
+              v-if="isSlackCreateMethod"
+              :data="createMethodData"
+              :secret-url="secretUrl"
+            />
 
             <copy-secret v-else :secret-url="secretUrl" />
           </template>
@@ -30,18 +26,21 @@
 /**
  * External dependencies.
  */
+import type { Ref } from 'vue';
 import { computed, defineComponent, ref } from 'vue';
 
 /**
  * Internal dependencies.
  */
-import TheHeader from '@/components/TheHeader/TheHeader.vue';
-import CreateSecret from '@/pages/Home/components/CreateSecret/CreateSecret.vue';
-import CopySecret from '@/pages/Home/components/CopySecret/CopySecret.vue';
 import { ShareMethod } from '@/enums/ShareMethod';
+import TheHeader from '@/components/TheHeader/TheHeader.vue';
+import CopySecret from '@/pages/Home/components/CopySecret/CopySecret.vue';
+import CreateSecret, { CreatedEventPayload } from '@/pages/Home/components/CreateSecret/CreateSecret.vue';
+import SlackSendSecretPersonalisation from '@/pages/Home/components/SlackSendSecretPersonalisation/SlackSendSecretPersonalisation.vue';
 
 export default defineComponent({
   components: {
+    SlackSendSecretPersonalisation,
     CopySecret,
     CreateSecret,
     TheHeader,
@@ -49,16 +48,24 @@ export default defineComponent({
 
   setup() {
     const secretUrl = ref('');
+    const createMethodData: Ref<CreatedEventPayload['createMethodData']> = ref(undefined);
     const createMethod = ref(ShareMethod.COPY);
-    const onCreated = (payload: { secretUrl: string; createMethod: ShareMethod }) => {
+    const onCreated = (payload: CreatedEventPayload) => {
       secretUrl.value = payload.secretUrl;
       createMethod.value = payload.createMethod;
+      createMethodData.value = payload.createMethodData;
     };
     const isSlackCreateMethod = computed(() => createMethod.value === ShareMethod.SLACK);
+    const reset = () => {
+      secretUrl.value = '';
+      createMethodData.value = undefined;
+    };
 
     return {
+      reset,
       secretUrl,
       onCreated,
+      createMethodData,
       isSlackCreateMethod,
     };
   },
