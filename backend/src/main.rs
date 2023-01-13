@@ -1,16 +1,11 @@
-use rocket::{get, routes};
+
 
 mod app;
 mod integrations;
 
-#[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
-}
-
 #[rocket::main]
 async fn main() {
-    let mut server = rocket::build().mount("/", routes![index]);
+    let mut server = rocket::build();
 
     #[cfg(debug_assertions)]
     {
