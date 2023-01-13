@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
+    "check-types": "vue-tsc --noEmit",
     "preview": "vite preview",
     "format": "prettier --write --list-different --config .prettierrc.cjs",
     "code-lint-fix": "eslint --fix",
