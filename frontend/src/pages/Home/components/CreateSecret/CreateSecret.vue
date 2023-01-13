@@ -2,13 +2,13 @@
   <div class="prose max-w-full">
     <h3 class="card-title">Create a secret below</h3>
 
-    <file-input max-size="40MB" @error="onFileError" @file="onFile">
-      <div v-if="!fileInfo" class="form-control mt-2 mb-4">
+    <file-input class="mb-4" max-size="40MB" @error="onFileError" @success="onFile">
+      <div v-if="!fileInfo" class="form-control">
         <textarea
           v-model="secret"
           :class="{ 'textarea-error': hasError }"
           autofocus
-          class="secret-textarea textarea w-full textarea-bordered"
+          class="secret-textarea textarea w-full textarea-bordered droppable-indicator"
           placeholder="Secret here"
         />
 
@@ -17,7 +17,7 @@
         </label>
       </div>
 
-      <div v-else class="form-control mt-2 mb-4">
+      <div v-else class="form-control droppable-indicator">
         You have uploaded a file: <strong>{{ fileInfo.name }}</strong>
       </div>
     </file-input>
@@ -60,7 +60,6 @@ import { createRandomSecret, DEFAULT_SECRET_LENGTH } from '@/utils/cryptography'
 import useConfig from '@/composables/useConfig';
 import SelectShareMethod from '@/pages/Home/components/SelectShareMethod/SelectShareMethod.vue';
 import FileInput from '@/components/FileInput/FileInput.vue';
-import FileTooLargeError from '@/exceptions/FileTooLargeError';
 import useNotifications from '@/composables/useNotifications';
 import { SecretInfo } from '@/types/SecretInfo';
 import { FileInfo } from '@/types/FileInfo';
@@ -162,7 +161,7 @@ export default defineComponent({
         type: file.type,
       };
     };
-    const onFileError = (error: FileTooLargeError) => {
+    const onFileError = () => {
       setErrorMessage({ message: 'File is larger than 40MB' });
     };
 

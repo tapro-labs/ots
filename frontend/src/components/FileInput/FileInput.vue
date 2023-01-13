@@ -1,37 +1,43 @@
 <template>
-  <div class="relative">
-    <div class="absolute top-2 right-4">
-      <div class="tooltip" data-tip="Upload a file">
-        <label :for="inputId" class="cursor-pointer hover:opacity-60">
-          <upload-icon class="h-6 w-6 text-black" />
+  <dropzone :validation="fileValidation" @error="$emit('error', $event)" @success="$emit('success', $event)">
+    <template #default="{ inputId }">
+      <div class="relative" v-bind="$attrs">
+        <div class="absolute top-2 right-4">
+          <div class="tooltip" data-tip="Drag or Upload a file">
+            <label :for="inputId" class="cursor-pointer hover:opacity-60">
+              <upload-icon class="h-6 w-6 text-black" />
+            </label>
+          </div>
+        </div>
 
-          <input :id="inputId" class="hidden" name="secret_file" type="file" @change="onFileUploaded" />
-        </label>
+        <slot />
       </div>
-    </div>
-    <slot />
-  </div>
+    </template>
+  </dropzone>
 </template>
 
 <script lang="ts">
 /**
  * External dependencies.
  */
-import { nanoid } from 'nanoid';
 import { computed, defineComponent, toRefs } from 'vue';
+import { ArrowUpTrayIcon as UploadIcon } from '@heroicons/vue/24/outline';
 
 /**
  * Internal dependencies.
  */
-import { ArrowUpTrayIcon as UploadIcon } from '@heroicons/vue/24/outline';
+import Dropzone from '@/components/Dropzone/Dropzone.vue';
 import FileTooLargeError from '@/exceptions/FileTooLargeError';
 
 export default defineComponent({
-  name: 'Upload',
+  name: 'FileInput',
 
   components: {
+    Dropzone,
     UploadIcon,
   },
+
+  inheritAttrs: false,
 
   props: {
     maxSize: {
@@ -41,18 +47,17 @@ export default defineComponent({
   },
 
   emits: {
-    file(_file: File) {
+    success(_file: File) {
       return true;
     },
 
-    error(_error: FileTooLargeError) {
+    error(_error: Error) {
       return true;
     },
   },
 
   setup(props, { emit }) {
     const { maxSize } = toRefs(props);
-    const inputId = `input-upload-${nanoid()}`;
     const fileMaxSizeInBytes = computed(() => {
       let size = parseInt(maxSize.value.slice(0, -2));
       const type = maxSize.value.slice(-2);
@@ -67,21 +72,14 @@ export default defineComponent({
 
       return size;
     });
-    const onFileUploaded = (event: Event) => {
-      const file = (event.target as any).files[0] as File;
-
+    const fileValidation = (file: File) => {
       if (file.size > fileMaxSizeInBytes.value) {
-        emit('error', new FileTooLargeError(file.size));
-
-        return;
+        return new FileTooLargeError(file.size);
       }
-
-      emit('file', file);
     };
 
     return {
-      inputId,
-      onFileUploaded,
+      fileValidation,
     };
   },
 });
