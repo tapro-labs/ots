@@ -864,7 +864,7 @@ dependencies = [
 
 [[package]]
 name = "ots_server"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "dotenvy",
  "envconfig",
@@ -1414,7 +1414,7 @@ dependencies = [
 
 [[package]]
 name = "slack"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "envconfig",
  "reqwest",
@@ -1472,7 +1472,7 @@ dependencies = [
 
 [[package]]
 name = "store"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "envconfig",
  "redis",
@@ -1792,7 +1792,7 @@ dependencies = [
 
 [[package]]
 name = "utils"
-version = "1.0.0"
+version = "1.1.0"
 dependencies = [
  "envconfig",
  "rocket",
