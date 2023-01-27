@@ -19,7 +19,7 @@
     "@kyvg/vue3-notification": "^2.8.0",
     "@tanstack/vue-query": "^4.22.0",
     "@vueuse/core": "^9.11.1",
-    "axios": "^0.27.2",
+    "axios": "^1.2.5",
     "copy-to-clipboard": "^3.3.3",
     "daisyui": "^2.47.0",
     "epic-spinners": "^1.1.0",
