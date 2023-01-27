@@ -37,7 +37,7 @@ services:
       - rust_cache:/usr/local/cargo
 
   frontend:
-    image: node:14.21.2
+    image: node:18.13.0
     depends_on:
       - workspace
     ports:
