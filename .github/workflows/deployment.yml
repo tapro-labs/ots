@@ -7,9 +7,21 @@ on:
       - 'frontend/**'
       - 'backend/**'
 
+  workflow_dispatch:
+    inputs:
+      force_build_frontend:
+        description: 'Force Build Frontend'
+        required: true
+        type: boolean
+      force_build_backend:
+        description: 'Force Build Backend'
+        required: true
+        type: boolean
+
 jobs:
   # JOB to run change detection
   changes:
+    if: ${{ inputs.force_build_frontend == false && inputs.force_build_backend == false }}
     runs-on: ubuntu-latest
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
@@ -27,7 +39,10 @@ jobs:
 
   build_frontend:
     needs: changes
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    if: |
+      always() &&
+      needs.changes.outputs.frontend == 'true' ||
+      inputs.force_build_frontend == true
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -52,7 +67,10 @@ jobs:
 
   build_backend:
     needs: changes
-    if: ${{ needs.changes.outputs.backend == 'true' }}
+    if: |
+      always() &&
+      needs.changes.outputs.backend == 'true' ||
+      inputs.force_build_backend == true
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -75,12 +93,12 @@ jobs:
           toolchain: 1.65
           override: true
       - name: Compute short github commit hash
-        run: echo "GITHUB_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+        run: echo "GITHUB_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-7`" >> $GITHUB_ENV
       - name: Build project
         run: make build
         env:
           ROCKET_PROFILE: release
-          OTS_BUILD_VERSION: ${GITHUB_SHORT_SHA}
+          OTS_BUILD_VERSION: ${{ env.GITHUB_SHORT_SHA }}
           ENABLED_FEATURES: ${{ secrets.ENABLED_FEATURES }}
       - name: Archive binary
         uses: actions/upload-artifact@v3
@@ -95,7 +113,8 @@ jobs:
     needs: [changes, build_backend, build_frontend]
     if: |
       always() &&
-      (needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true') &&
+      (needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true' ||
+      inputs.force_build_frontend == true || inputs.force_build_backend == true) &&
       !contains(needs.*.result, 'cancelled') &&
       !contains(needs.*.result, 'failure')
     env:
@@ -104,6 +123,8 @@ jobs:
       DOCKER_BACKEND_IMAGE: eu.gcr.io/tapro-labs/ots/ots-backend
       DOCKER_FRONTEND_IMAGE: eu.gcr.io/tapro-labs/ots/ots-frontend
       DOCKER_TAG_NAME: ots-deployment-${{ github.run_number }}
+      FRONTEND_CHANGED: ${{ needs.changes.outputs.frontend == 'true' || inputs.force_build_frontend == true }}
+      BACKEND_CHANGED: ${{ needs.changes.outputs.backend == 'true' || inputs.force_build_backend == true }}
     steps:
       - uses: actions/checkout@v3
 
@@ -128,33 +149,33 @@ jobs:
           kubectl config use-context taprolabs_context
 
       - name: 'Download backend artifact'
-        if: ${{ needs.changes.outputs.backend == 'true' }}
+        if: ${{ env.BACKEND_CHANGED == 'true' }}
         uses: actions/download-artifact@v3
         with:
           name: backend-build
           path: ./backend/target/release/ # ots_server executable will be put under release
 
       - name: 'Download frontend artifact'
-        if: ${{ needs.changes.outputs.frontend == 'true' }}
+        if: ${{ env.FRONTEND_CHANGED == 'true' }}
         uses: actions/download-artifact@v3
         with:
           name: frontend-build
           path: ./frontend/dist/
 
       - name: 'Build backend docker image'
-        if: ${{ needs.changes.outputs.backend == 'true' }}
+        if: ${{ env.BACKEND_CHANGED == 'true' }}
         run: docker build -f Dockerfile.backend -t ${{ env.DOCKER_BACKEND_IMAGE }}:production .
 
       - name: 'Pull latest backend production image if backend was not built'
-        if: ${{ needs.changes.outputs.backend == 'false' }}
+        if: ${{ env.BACKEND_CHANGED == 'false' }}
         run: docker pull ${{ env.DOCKER_BACKEND_IMAGE }}:production
 
       - name: 'Build frontend docker image'
-        if: ${{ needs.changes.outputs.frontend == 'true' }}
+        if: ${{ env.FRONTEND_CHANGED == 'true' }}
         run: docker build -f Dockerfile.frontend -t ${{ env.DOCKER_FRONTEND_IMAGE }}:production .
 
       - name: 'Pull latest frontend production image if frontend was not built'
-        if: ${{ needs.changes.outputs.frontend == 'false' }}
+        if: ${{ env.FRONTEND_CHANGED == 'false' }}
         run: docker pull ${{ env.DOCKER_FRONTEND_IMAGE }}:production
 
       - name: 'Tag and push backend docker image'
