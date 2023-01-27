@@ -35,7 +35,7 @@
     "@types/node": "^18.11.18",
     "@types/sjcl": "^1.0.30",
     "@typescript-eslint/parser": "^5.48.2",
-    "@vitejs/plugin-vue": "3",
+    "@vitejs/plugin-vue": "4",
     "autoprefixer": "^10.4.13",
     "eslint": "8.32.0",
     "eslint-import-resolver-typescript": "^3.5.3",
