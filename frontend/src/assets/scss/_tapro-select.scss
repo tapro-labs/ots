@@ -1,0 +1,22 @@
+.tapro-select {
+  @apply select items-center;
+
+  display: flex !important;
+
+  & > input,
+  & > .dropdown.icon {
+    @apply flex items-center;
+
+    height: 100% !important;
+  }
+
+  & > .dropdown.icon {
+    transition: transform 0.3s, opacity 0.3s !important;
+  }
+
+  &.active {
+    & > .dropdown.icon {
+      transform: rotate(180deg);
+    }
+  }
+}
