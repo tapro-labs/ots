@@ -1,18 +1,20 @@
 /* ------------------------------------------------------------ *\
-    Components
-\* ------------------------------------------------------------ */
-
-@import './notifier';
-@import './droppable';
-
-.big-textarea {
-  min-height: 12rem !important;
-}
-
-/* ------------------------------------------------------------ *\
     Vendor
 \* ------------------------------------------------------------ */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import 'vue-search-select/dist/VueSearchSelect.css';
+
+/* ------------------------------------------------------------ *\
+    Components
+\* ------------------------------------------------------------ */
+
+@import 'notifier';
+@import 'droppable';
+@import 'tapro-select';
+
+.big-textarea {
+  min-height: 12rem !important;
+}

@@ -9,9 +9,7 @@
     <template v-else>
       <half-circle-spinner v-if="isLoading" :size="32" class="mx-auto" color="#000" />
 
-      <select v-else :id="inputId" class="select select-bordered w-full max-w-xs" @change="onSelect">
-        <option v-for="user in nonBotUsers" :key="user.id" :value="user.id">{{ user.name }}</option>
-      </select>
+      <tapro-select v-else :id="inputId" v-model="selectedUser" :options="usersForSelect" />
     </template>
   </div>
 </template>
@@ -20,9 +18,10 @@
 /**
  * External dependencies.
  */
+import omit from 'lodash.omit';
 import { nanoid } from 'nanoid';
 import { HalfCircleSpinner } from 'epic-spinners';
-import { computed, defineComponent, watch } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 
 /**
  * Internal dependencies.
@@ -30,11 +29,13 @@ import { computed, defineComponent, watch } from 'vue';
 import useApiToken from '@/composables/integrations/slack/useApiToken';
 import useFetchUsers, { SlackUser } from '@/composables/integrations/slack/useFetchUsers';
 import ConnectViaSlack from '@/components/integrations/ConnectViaSlack/ConnectViaSlack.vue';
+import TaproSelect from '@/components/Select/Select.vue';
 
 export default defineComponent({
   name: 'SelectSlackUser',
 
   components: {
+    TaproSelect,
     ConnectViaSlack,
     HalfCircleSpinner,
   },
@@ -49,22 +50,28 @@ export default defineComponent({
     const inputId = nanoid();
     const { apiToken } = useApiToken();
     const { users, isLoading } = useFetchUsers();
+    const selectedUser = ref<SlackUser | undefined>(undefined);
     const nonBotUsers = computed(() =>
       users.value.filter(user => user.name !== 'Slackbot' && !user.isBot && !user.deleted)
     );
+    const usersForSelect = computed(() =>
+      nonBotUsers.value.map(user => ({
+        text: user.name,
+        value: user.id,
+        ...user,
+      }))
+    );
 
-    const onSelect = (event: Event) => {
-      const id: string = (event?.target as HTMLSelectElement).value;
+    watch(selectedUser, newValue => {
+      if (!newValue) {
+        return;
+      }
 
-      emitChangeEvent(id);
-    };
-
-    const emitChangeEvent = (id: string) => {
-      emit('change', users.value.find(user => user.id === id) as SlackUser);
-    };
+      emit('change', omit(newValue, ['text', 'value']) as SlackUser);
+    });
 
     watch(
-      nonBotUsers,
+      usersForSelect,
       (newValue, oldValue) => {
         // if we do not have new users, then do nothing
         // if we had users before, then do nothing
@@ -72,18 +79,18 @@ export default defineComponent({
           return;
         }
 
-        // else if we had nothing emit change event to the first user
-        emitChangeEvent(newValue[0].id);
+        selectedUser.value = newValue[0];
       },
       { immediate: true }
     );
 
     return {
       inputId,
-      onSelect,
+      selectedUser,
       apiToken,
       isLoading,
       nonBotUsers,
+      usersForSelect,
     };
   },
 });
