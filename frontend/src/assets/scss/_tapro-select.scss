@@ -1,13 +1,10 @@
 .tapro-select {
-  @apply select items-center;
-
-  display: flex !important;
+  @apply select;
+  @apply inline-flex items-center border-base-content rounded-btn #{!important};
 
   & > input,
   & > .dropdown.icon {
-    @apply flex items-center;
-
-    height: 100% !important;
+    @apply h-full flex items-center #{!important};
   }
 
   & > .dropdown.icon {
