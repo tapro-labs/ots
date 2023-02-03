@@ -50,7 +50,7 @@ export default defineComponent({
     const inputId = nanoid();
     const { apiToken } = useApiToken();
     const { users, isLoading } = useFetchUsers();
-    const selectedUser = ref<SlackUser | null>(null);
+    const selectedUser = ref<SlackUser | undefined>(undefined);
     const nonBotUsers = computed(() =>
       users.value.filter(user => user.name !== 'Slackbot' && !user.isBot && !user.deleted)
     );
@@ -67,7 +67,7 @@ export default defineComponent({
         return;
       }
 
-      emit('change', omit(newValue, ['text', 'value']));
+      emit('change', omit(newValue, ['text', 'value']) as SlackUser);
     });
 
     watch(
