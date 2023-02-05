@@ -24,7 +24,7 @@
     "daisyui": "^2.50.0",
     "epic-spinners": "^2.0.0",
     "generate-password-browser": "^1.1.0",
-    "nanoid": "^4.0.0",
+    "nanoid": "^4.0.1",
     "sjcl": "^1.0.8",
     "vue": "^3.2.47",
     "vue-lottie": "^0.2.1",
