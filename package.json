@@ -11,10 +11,10 @@
   },
   "devDependencies": {
     "husky": "^8.0.3",
-    "lint-staged": "13.1.1"
+    "lint-staged": "13.1.2"
   },
   "volta": {
-    "node": "18.14.0",
+    "node": "18.14.1",
     "yarn": "1.22.19"
   },
   "engines": {
