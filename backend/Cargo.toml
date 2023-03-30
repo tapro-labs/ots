@@ -15,7 +15,7 @@ serde = { workspace = true }
 envconfig = { workspace = true }
 
 [build-dependencies]
-dotenvy = { version = "0.15.6" }
+dotenvy = { version = "0.15.7" }
 
 [workspace]
 members = ["features/*", "lib/*"]
@@ -23,7 +23,7 @@ members = ["features/*", "lib/*"]
 [workspace.dependencies]
 store = { path = "./lib/store" }
 utils = { path = "./lib/utils" }
-rocket = { version = "0.5.0-rc.2", features = ["secrets", "json", "tls"] }
+rocket = { version = "0.5.0-rc.3", features = ["secrets", "json", "tls"] }
 serde = { version = "1.0", features = ["derive"] }
 uuid = { version = "1.3", features = ["v4"] }
 reqwest = { version = "0.11", features = ["blocking", "json"] }
