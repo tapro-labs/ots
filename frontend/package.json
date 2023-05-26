@@ -15,7 +15,7 @@
     "style-lint-check": "stylelint ./src/*.{css,scss,vue} ./src/**/*.{css,scss,vue}"
   },
   "dependencies": {
-    "@heroicons/vue": "^2.0.16",
+    "@heroicons/vue": "^2.0.17",
     "@kyvg/vue3-notification": "^2.9.0",
     "@tanstack/vue-query": "^4.27.0",
     "@vueuse/core": "^10.0.2",
