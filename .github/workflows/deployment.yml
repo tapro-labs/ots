@@ -119,25 +119,19 @@ jobs:
       !contains(needs.*.result, 'failure')
     env:
       DEPLOYMENT_NAMESPACE: ots
-      DOCKER_IMAGE_PREFIX: eu.gcr.io/tapro-labs/ots
-      DOCKER_BACKEND_IMAGE: eu.gcr.io/tapro-labs/ots/ots-backend
-      DOCKER_FRONTEND_IMAGE: eu.gcr.io/tapro-labs/ots/ots-frontend
+      DOCKER_BACKEND_IMAGE: taprolabsregistry/ots-backend
+      DOCKER_FRONTEND_IMAGE: taprolabsregistry/ots-frontend
       DOCKER_TAG_NAME: ots-deployment-${{ github.run_number }}
       FRONTEND_CHANGED: ${{ needs.changes.outputs.frontend == 'true' || inputs.force_build_frontend == true }}
       BACKEND_CHANGED: ${{ needs.changes.outputs.backend == 'true' || inputs.force_build_backend == true }}
     steps:
       - uses: actions/checkout@v3
 
-      - name: 'Authenticate Cloud'
-        uses: 'google-github-actions/auth@v1'
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          credentials_json: ${{ secrets.GCLOUD_CREDENTIAL_FILE }}
-
-      - name: 'Set up Cloud SDK'
-        uses: 'google-github-actions/setup-gcloud@v1'
-
-      - name: 'Use gcloud CLI'
-        run: 'gcloud config set project ${{ secrets.PROJECT_ID }} && gcloud auth configure-docker'
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: 'Set k8s cluster config'
         run: |
