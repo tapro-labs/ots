@@ -99,7 +99,7 @@ jobs:
         env:
           ROCKET_PROFILE: release
           OTS_BUILD_VERSION: ${{ env.GITHUB_SHORT_SHA }}
-          ENABLED_FEATURES: ${{ secrets.ENABLED_FEATURES }}
+          ENABLED_FEATURES: ${{ vars.ENABLED_FEATURES }}
       - name: Archive binary
         uses: actions/upload-artifact@v3
         with:
