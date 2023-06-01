@@ -14,7 +14,7 @@ volumes:
 
 services:
   redis:
-    image: redis:7.0.10-alpine
+    image: redis:7.0.11-alpine
     networks:
       - backend
     ports:
@@ -37,7 +37,7 @@ services:
       - rust_cache:/usr/local/cargo
 
   frontend:
-    image: node:18.15.0
+    image: node:18.16.0
     depends_on:
       - workspace
     ports:
