@@ -74,11 +74,9 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Install rust version
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@b44cb146d03e8d870c57ab64b80f04586349ca5d
         with:
-          profile: minimal
           toolchain: 1.65
-          override: true
       - name: Linting
         run: make lint
       - name: Build

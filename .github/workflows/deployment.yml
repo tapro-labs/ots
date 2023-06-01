@@ -87,11 +87,9 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Install rust version
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@b44cb146d03e8d870c57ab64b80f04586349ca5d
         with:
-          profile: minimal
           toolchain: 1.65
-          override: true
       - name: Compute short github commit hash
         run: echo "GITHUB_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-7`" >> $GITHUB_ENV
       - name: Build project
