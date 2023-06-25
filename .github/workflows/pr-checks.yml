@@ -74,7 +74,7 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Install rust version
-        uses: dtolnay/rust-toolchain@b44cb146d03e8d870c57ab64b80f04586349ca5d
+        uses: dtolnay/rust-toolchain@0e66bd3e6b38ec0ad5312288c83e47c143e6b09e
         with:
           toolchain: 1.65
       - name: Linting
