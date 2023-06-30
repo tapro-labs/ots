@@ -21,7 +21,7 @@
     "@vueuse/core": "^10.1.2",
     "axios": "^1.4.0",
     "copy-to-clipboard": "^3.3.3",
-    "daisyui": "^2.52.0",
+    "daisyui": "3",
     "epic-spinners": "^2.0.0",
     "generate-password-browser": "^1.1.0",
     "nanoid": "^4.0.2",
