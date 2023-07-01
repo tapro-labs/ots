@@ -4,6 +4,9 @@ module.exports = {
     'stylelint-config-standard-vue/scss'
   ],
   rules:     {
+    "font-family-name-quotes": "always-where-recommended",
+    "function-url-quotes": "always",
+    "selector-attribute-quotes": "always",
     'scss/at-rule-no-unknown': [
       true,
       {
