@@ -4,7 +4,7 @@
 .vue-notification-group {
   z-index: 9999999 !important;
 
-  @media (max-width: 479px) {
+  @media (max-width <= 479px) {
     width: 100% !important;
   }
 }
@@ -35,7 +35,7 @@
       }
     }
 
-    @media (max-width: 479px) {
+    @media (max-width <= 479px) {
       border-radius: 0;
       max-width: 100%;
     }
@@ -67,7 +67,7 @@
 
     // Hide the duration progress bar.
 
-    content: '';
+    content: 'test';
     position: absolute;
     left: 0;
     bottom: 0;
