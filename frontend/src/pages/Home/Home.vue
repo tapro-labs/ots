@@ -10,6 +10,7 @@
               v-if="isSlackCreateMethod && createMethodData"
               :data="createMethodData"
               :secret-url="secretUrl"
+              @back="reset"
             />
 
             <copy-secret v-else :secret-url="secretUrl" />
