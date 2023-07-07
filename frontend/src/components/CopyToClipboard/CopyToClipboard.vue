@@ -1,5 +1,5 @@
 <template>
-  <button class="btn btn-square rounded-l-none" @click="copy">
+  <button class="btn btn-primary btn-square rounded-l-none" @click="copy">
     <clipboard-icon class="h-6 w-6 text-white" />
   </button>
 </template>
