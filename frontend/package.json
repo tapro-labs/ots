@@ -47,7 +47,7 @@
     "lodash.omit": "^4.5.0",
     "postcss": "^8.4.26",
     "postcss-html": "^1.5.0",
-    "prettier": "2.8.8",
+    "prettier": "3.0.0",
     "sass": "^1.63.6",
     "stylelint": "15.10.1",
     "stylelint-config-standard": "33.0.0",
