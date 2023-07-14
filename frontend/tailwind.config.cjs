@@ -1,4 +1,3 @@
-console.log(require('daisyui/src/theming/themes')['[data-theme=light]']);
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [

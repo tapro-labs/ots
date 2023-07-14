@@ -18,14 +18,8 @@ export default class EncryptStreamTransformer {
 
     this.writable = new WritableStream({
       write: async data => {
-        try {
-          const d = (await encrypt(key, data)) + EncryptStreamTransformer.SEPARATOR;
-          console.log('b');
-          onChunk(d);
-          console.log('a');
-        } catch (e) {
-          console.log(e);
-        }
+        const encrypted = (await encrypt(key, data)) + EncryptStreamTransformer.SEPARATOR;
+        onChunk(encrypted);
       },
       close() {
         onClose();
