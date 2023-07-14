@@ -2,14 +2,14 @@
  * External dependencies.
  */
 
-import DecryptStreamTransformer from '@/stream-transformers/DecryptStreamTransformer';
-
 /**
  * Internal dependencies.
  */
+import { SecretCryptograhyKey } from '@/utils/cryptography';
+import DecryptStreamTransformer from '@/stream-transformers/DecryptStreamTransformer';
 
 export type DecryptStreamOptions = {
-  key: string;
+  key: SecretCryptograhyKey;
   data: ReadableStream<string>;
 };
 
