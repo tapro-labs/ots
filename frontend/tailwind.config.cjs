@@ -18,6 +18,7 @@ module.exports = {
         light: {
           ...require('daisyui/src/theming/themes')['[data-theme=light]'],
           'primary-content': '#fff',
+          'secondary-content': '#fff',
         }
       }
     ],
