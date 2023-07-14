@@ -122,9 +122,7 @@ export default defineComponent({
           };
         }
 
-        console.log('b');
         const secretKey = await createEncryptionKey(DEFAULT_SECRET_LENGTH);
-        console.log(secretKey);
         const secretId = await createSecret({ data: stream, key: secretKey });
         const cryptograhyDetails = window.btoa(JSON.stringify({ secretKey, secretInfo }));
         const secretUrl = window.location.origin + '/secret/' + secretId + '#' + cryptograhyDetails;
