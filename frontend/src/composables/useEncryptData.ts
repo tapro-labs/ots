@@ -10,9 +10,10 @@ import Uint8StreamLimiter from '@/stream-transformers/Uint8StreamLimiter';
 import EncryptStreamTransformer from '@/stream-transformers/EncryptStreamTransformer';
 import GenericStreamTransformation from '@/stream-transformers/GenericStreamTransformation';
 import OtsConfig from '@/utils/otsConfig';
+import { SecretCryptograhyKey } from '@/utils/cryptography';
 
 export type EncryptStreamOptions = {
-  key: string;
+  key: SecretCryptograhyKey;
   data: ReadableStream<Uint8Array>;
 };
 

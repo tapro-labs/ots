@@ -14,8 +14,16 @@
         linear-gradient(0deg, $border-color 50%, transparent 50%),
         linear-gradient(0deg, $border-color 50%, transparent 50%);
       background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
-      background-size: 16px 4px, 16px 4px, 4px 16px, 4px 16px;
-      background-position: 0 0, 100% 100%, 0 100%, 100% 0;
+      background-size:
+        16px 4px,
+        16px 4px,
+        4px 16px,
+        4px 16px;
+      background-position:
+        0 0,
+        100% 100%,
+        0 100%,
+        100% 0;
       animation: dash 10s linear alternate infinite;
     }
   }
@@ -23,6 +31,10 @@
 
 @keyframes dash {
   to {
-    background-position: 50% 0%, 50% 100%, 0% -200%, 100% 200%;
+    background-position:
+      50% 0%,
+      50% 100%,
+      0% -200%,
+      100% 200%;
   }
 }

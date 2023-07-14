@@ -23,9 +23,7 @@
     "copy-to-clipboard": "^3.3.3",
     "daisyui": "3",
     "epic-spinners": "^2.0.0",
-    "generate-password-browser": "^1.1.0",
     "nanoid": "^4.0.2",
-    "sjcl": "^1.0.8",
     "vue": "^3.3.4",
     "vue-lottie": "^0.2.1",
     "vue-router": "^4.2.4"
@@ -34,7 +32,6 @@
     "@tailwindcss/typography": "^0.5.9",
     "@types/lodash.omit": "^4.5.7",
     "@types/node": "^18.16.19",
-    "@types/sjcl": "^1.0.30",
     "@typescript-eslint/parser": "^5.62.0",
     "@vitejs/plugin-vue": "4",
     "autoprefixer": "^10.4.14",

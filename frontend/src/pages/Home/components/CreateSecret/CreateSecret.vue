@@ -56,7 +56,7 @@ import useApiToken from '@/composables/integrations/slack/useApiToken';
 import useSendMessage from '@/composables/integrations/slack/useSendMessage';
 import { SlackUser } from '@/composables/integrations/slack/useFetchUsers';
 import { ShareMethod } from '@/enums/ShareMethod';
-import { createRandomSecret, DEFAULT_SECRET_LENGTH } from '@/utils/cryptography';
+import { createEncryptionKey, DEFAULT_SECRET_LENGTH } from '@/utils/cryptography';
 import useConfig from '@/composables/useConfig';
 import SelectShareMethod from '@/pages/Home/components/SelectShareMethod/SelectShareMethod.vue';
 import FileInput from '@/components/FileInput/FileInput.vue';
@@ -122,7 +122,7 @@ export default defineComponent({
           };
         }
 
-        const secretKey = await createRandomSecret(DEFAULT_SECRET_LENGTH);
+        const secretKey = await createEncryptionKey(DEFAULT_SECRET_LENGTH);
         const secretId = await createSecret({ data: stream, key: secretKey });
         const cryptograhyDetails = window.btoa(JSON.stringify({ secretKey, secretInfo }));
         const secretUrl = window.location.origin + '/secret/' + secretId + '#' + cryptograhyDetails;
