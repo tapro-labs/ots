@@ -123,4 +123,7 @@ module.exports = {
     },
     sourceType: 'module',
   },
+  globals: {
+    JsonWebKey: 'readonly',
+  }
 };

@@ -1,10 +1,10 @@
-import { decrypt } from '@/utils/cryptography';
+import { decrypt, SecretCryptograhyKey } from '@/utils/cryptography';
 
 export default class DecryptStreamTransformer {
   public readable: ReadableStream<string>;
   public writable: WritableStream<string>;
 
-  constructor(key: string) {
+  constructor(key: SecretCryptograhyKey) {
     let onClose: Function;
     let onChunk: (_data: string) => void;
 
@@ -16,7 +16,7 @@ export default class DecryptStreamTransformer {
     });
 
     this.writable = new WritableStream({
-      write: data => onChunk(decrypt(key, data)),
+      write: async data => onChunk(await decrypt(key, data)),
       close() {
         onClose();
       },

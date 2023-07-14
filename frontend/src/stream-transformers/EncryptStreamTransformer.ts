@@ -1,11 +1,11 @@
-import { encrypt } from '@/utils/cryptography';
+import { encrypt, SecretCryptograhyKey } from '@/utils/cryptography';
 
 export default class EncryptStreamTransformer {
   public static readonly SEPARATOR = '$_$';
   public readable: ReadableStream<string>;
   public writable: WritableStream<string>;
 
-  constructor(key: string) {
+  constructor(key: SecretCryptograhyKey) {
     let onClose: Function;
     let onChunk: (_data: string) => void;
 
@@ -17,7 +17,16 @@ export default class EncryptStreamTransformer {
     });
 
     this.writable = new WritableStream({
-      write: data => onChunk(encrypt(key, data) + EncryptStreamTransformer.SEPARATOR),
+      write: async data => {
+        try {
+          const d = (await encrypt(key, data)) + EncryptStreamTransformer.SEPARATOR;
+          console.log('b');
+          onChunk(d);
+          console.log('a');
+        } catch (e) {
+          console.log(e);
+        }
+      },
       close() {
         onClose();
       },
