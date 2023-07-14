@@ -1,3 +1,4 @@
+console.log(require('daisyui/src/theming/themes')['[data-theme=light]']);
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -10,5 +11,15 @@ module.exports = {
   plugins: [
     require('@tailwindcss/typography'),
     require('daisyui')
-  ]
+  ],
+  daisyui: {
+    themes: [
+      {
+        light: {
+          ...require('daisyui/src/theming/themes')['[data-theme=light]'],
+          'primary-content': '#fff',
+        }
+      }
+    ],
+  }
 };
