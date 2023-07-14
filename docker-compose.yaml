@@ -14,7 +14,7 @@ volumes:
 
 services:
   redis:
-    image: redis:7.0.11-alpine
+    image: redis:7.0.12-alpine
     networks:
       - backend
     ports:
