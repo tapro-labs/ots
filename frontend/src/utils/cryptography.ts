@@ -1,21 +1,16 @@
-/**
- * External dependencies.
- */
-import sjcl from 'sjcl';
-
-/**
- * Internal dependencies.
- */
-
 export type SecretCryptograhyKey = JsonWebKey;
 
+export const DEFAULT_IV_LENGTH = 12;
 export const DEFAULT_SECRET_LENGTH = 256;
+export const ENCRYPTION_ALGORITHM = 'AES-GCM';
 
-export const createRandomSecret = async (length: number): Promise<SecretCryptograhyKey> => {
+export const createEncryptionKey = async (length: number): Promise<SecretCryptograhyKey> => {
   try {
-    const secretKey = await window.crypto.subtle.generateKey({ name: 'AES-GCM', length }, true, ['encrypt', 'decrypt']);
+    const secretKey = await window.crypto.subtle.generateKey({ name: ENCRYPTION_ALGORITHM, length }, true, [
+      'encrypt',
+      'decrypt',
+    ]);
 
-    console.log(secretKey);
     return await window.crypto.subtle.exportKey('jwk', secretKey);
   } catch (e) {
     console.error(e);
@@ -24,22 +19,30 @@ export const createRandomSecret = async (length: number): Promise<SecretCryptogr
   }
 };
 
-const ct = new TextEncoder().encode('�#�|J\x1E�7td\x16j');
+export const generateIV = () => window.crypto.getRandomValues(new Uint8Array(DEFAULT_IV_LENGTH));
+export const convertToCryptoKey = (secret: SecretCryptograhyKey) =>
+  window.crypto.subtle.importKey('jwk', secret, { name: ENCRYPTION_ALGORITHM }, true, ['decrypt', 'encrypt']);
 
 export const encrypt = async (secret: SecretCryptograhyKey, data: string): Promise<string> => {
   try {
-    const algorithm = 'AES-GCM';
     const encoder = new TextEncoder();
-    const dataBuffer = encoder.encode(data);
-    const key = await window.crypto.subtle.importKey('jwk', secret, { name: algorithm }, true, ['encrypt']);
-    const encryptedData = await window.crypto.subtle.encrypt({ name: algorithm, iv: ct }, key, dataBuffer);
+    const buffer = encoder.encode(data);
+    const key = await convertToCryptoKey(secret);
+    const iv = generateIV();
+    const encryptedData = new Uint8Array(
+      await window.crypto.subtle.encrypt({ name: ENCRYPTION_ALGORITHM, iv }, key, buffer)
+    );
+    const ivAndEncryptedData = new Uint8Array(iv.length + encryptedData.byteLength);
 
-    const encryptedDataArray = Array.from(new Uint8Array(encryptedData));
+    ivAndEncryptedData.set(iv);
+    ivAndEncryptedData.set(encryptedData, iv.length);
 
     // Convert the encrypted data to a base64 string
-    const base64EncryptedData = btoa(encryptedDataArray.map(byte => String.fromCharCode(byte)).join(''));
-
-    return base64EncryptedData;
+    return window.btoa(
+      Array.from(ivAndEncryptedData)
+        .map(byte => String.fromCharCode(byte))
+        .join('')
+    );
   } catch (e) {
     console.error(e);
 
@@ -50,24 +53,22 @@ export const encrypt = async (secret: SecretCryptograhyKey, data: string): Promi
 // We assume that decrypt will always receive data in base64 format
 export const decrypt = async (secret: SecretCryptograhyKey, encryptedData: string): Promise<string> => {
   try {
-    const algorithm = 'AES-GCM';
-    const decoder = new TextDecoder();
-    const key = await window.crypto.subtle.importKey('jwk', secret, { name: algorithm }, true, ['encrypt', 'decrypt']);
-
-    const encryptedDataArray = atob(encryptedData)
-      .split('')
-      .map(char => char.charCodeAt(0));
-
-    const decryptedDataBuffer = await window.crypto.subtle.decrypt(
-      { name: algorithm, iv: ct },
-      key,
-      new Uint8Array(encryptedDataArray)
+    const key = await convertToCryptoKey(secret);
+    const ivAndEncryptedData = new Uint8Array(
+      window
+        .atob(encryptedData)
+        .split('')
+        .map(char => char.charCodeAt(0))
     );
+    const iv = ivAndEncryptedData.slice(0, DEFAULT_IV_LENGTH);
+    const encryptedBytes = ivAndEncryptedData.slice(DEFAULT_IV_LENGTH);
+    const decrypted = await window.crypto.subtle.decrypt({ name: ENCRYPTION_ALGORITHM, iv }, key, encryptedBytes);
+    const decoder = new TextDecoder();
 
-    const decryptedData = decoder.decode(decryptedDataBuffer);
-
-    return decryptedData;
+    return decoder.decode(decrypted);
   } catch (e) {
     console.error(e);
+
+    throw e;
   }
 };
