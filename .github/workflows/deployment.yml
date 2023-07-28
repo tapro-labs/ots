@@ -66,30 +66,53 @@ jobs:
           retention-days: 1
 
   build_backend:
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - TARGET: x86_64-unknown-linux-gnu
+            OS: ubuntu-20.04
+          - TARGET: armv7-unknown-linux-gnueabihf
+            OS: ubuntu-20.04
     needs: changes
     if: |
       always() &&
       needs.changes.outputs.backend == 'true' ||
       inputs.force_build_backend == true
-    runs-on: ubuntu-20.04
+    runs-on: ${{ matrix.OS }}
     defaults:
       run:
         working-directory: ./backend
+    env:
+      OS: ${{ matrix.OS }}
+      TARGET: ${{ matrix.TARGET }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/cache@v3
         with:
           path: |
             ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
+            ~/.cargo/registry
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ matrix.TARGET }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Install rust version
         uses: dtolnay/rust-toolchain@0e66bd3e6b38ec0ad5312288c83e47c143e6b09e
         with:
           toolchain: 1.65
+      - name: Install and configure dependencies
+        run: |
+          sudo apt-get install -qq crossbuild-essential-arm64 crossbuild-essential-armhf
+
+          # some additional configuration for cross-compilation on linux
+          cat >>~/.cargo/config <<EOF
+          [target.aarch64-unknown-linux-gnu]
+          linker = "aarch64-linux-gnu-gcc"
+          [target.armv7-unknown-linux-gnueabihf]
+          linker = "arm-linux-gnueabihf-gcc"
+          EOF
+      - name: Install rust target
+        run: rustup target add $TARGET
       - name: Compute short github commit hash
         run: echo "GITHUB_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-7`" >> $GITHUB_ENV
       - name: Build project
@@ -98,11 +121,15 @@ jobs:
           ROCKET_PROFILE: release
           OTS_BUILD_VERSION: ${{ env.GITHUB_SHORT_SHA }}
           ENABLED_FEATURES: ${{ vars.ENABLED_FEATURES }}
+      - name: Compress binary
+        run: |
+          mkdir ./artifacts
+          tar -czf "./artifacts/ots_server-$TARGET.tar.gz" ./target/$TARGET/release/ots_server
       - name: Archive binary
         uses: actions/upload-artifact@v3
         with:
           name: backend-build
-          path: ${{ github.workspace }}/backend/target/release/ots_server
+          path: ./artifacts
           if-no-files-found: error
           retention-days: 1
 
