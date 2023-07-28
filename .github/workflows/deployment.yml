@@ -75,7 +75,7 @@ jobs:
             ARCH: x86_64
           - TARGET: aarch64-unknown-linux-gnu
             OS: ubuntu-20.04
-            ARCH: aarch64
+            ARCH: arm
     needs: changes
     if: |
       always() &&
@@ -106,9 +106,9 @@ jobs:
         run: |
           if [ "${{ matrix.ARCH }}" == "aarch64" ]; then
             sudo apt-get install -y crossbuild-essential-arm64 crossbuild-essential-armhf binutils-aarch64-linux-gnu
-            sudo dpkg --add-architecture arm64
-            sudo apt-get update -y
-            sudo apt-get install -y libssl-dev:arm64
+#            sudo dpkg --add-architecture arm64
+#            sudo apt-get update -y
+#            sudo apt-get install -y libssl-dev:arm64
           fi
 
           # some additional configuration for cross-compilation on linux
@@ -121,7 +121,7 @@ jobs:
       - name: Compute short github commit hash
         run: echo "GITHUB_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-7`" >> $GITHUB_ENV
       - name: Symlink correct headers
-        run: sudo ln -s /usr/include/${{ matrix.ARCH }}-linux-gnu/openssl/opensslconf.h /usr/include/openssl/opensslconf.h
+        run: sudo ln -s /usr/include/x86_64-linux-gnu/openssl/opensslconf.h /usr/include/openssl/opensslconf.h
       - name: Build project
         run: make build
         env:
