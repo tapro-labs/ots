@@ -72,8 +72,10 @@ jobs:
         include:
           - TARGET: x86_64-unknown-linux-gnu
             OS: ubuntu-20.04
+            ARCH: x86_64
           - TARGET: armv7-unknown-linux-gnueabihf
             OS: ubuntu-20.04
+            ARCH: aarch64
     needs: changes
     if: |
       always() &&
@@ -102,7 +104,7 @@ jobs:
           toolchain: 1.65
       - name: Install and configure dependencies
         run: |
-          sudo apt-get install -qq crossbuild-essential-arm64 crossbuild-essential-armhf
+          sudo apt-get install -y crossbuild-essential-arm64 crossbuild-essential-armhf binutils-aarch64-linux-gnu
 
           # some additional configuration for cross-compilation on linux
           cat >>~/.cargo/config <<EOF
@@ -118,6 +120,7 @@ jobs:
       - name: Build project
         run: make build
         env:
+          PKG_CONFIG_SYSROOT_DIR: /
           ROCKET_PROFILE: release
           OTS_BUILD_VERSION: ${{ env.GITHUB_SHORT_SHA }}
           ENABLED_FEATURES: ${{ vars.ENABLED_FEATURES }}
