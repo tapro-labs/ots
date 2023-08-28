@@ -39,7 +39,7 @@
     "eslint-import-resolver-typescript": "^3.5.5",
     "eslint-plugin-import": "2.27.5",
     "eslint-plugin-no-unsanitized": "4.0.2",
-    "eslint-plugin-unicorn": "47.0.0",
+    "eslint-plugin-unicorn": "48.0.1",
     "eslint-plugin-vue": "9.15.1",
     "lodash.omit": "^4.5.0",
     "postcss": "^8.4.27",
