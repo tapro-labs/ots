@@ -14,7 +14,7 @@
     "lint-staged": "13.2.3"
   },
   "volta": {
-    "node": "18.16.1",
+    "node": "18.17.0",
     "yarn": "1.22.19"
   },
   "engines": {

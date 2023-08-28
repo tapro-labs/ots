@@ -49,10 +49,7 @@ jobs:
         working-directory: ./frontend
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18.16.1
-          cache: 'yarn'
+      - uses: volta-cli/action@d253558a6e356722728a10e9a469190de21a83ef
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Build app
