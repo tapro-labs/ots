@@ -121,7 +121,12 @@ jobs:
       BACKEND_CHANGED: ${{ needs.changes.outputs.backend == 'true' || inputs.force_build_backend == true }}
     steps:
       - uses: actions/checkout@v3
-
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: "arm64,arm"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
