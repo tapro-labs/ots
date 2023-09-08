@@ -27,7 +27,7 @@ jobs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50
         id: filter
         with:
@@ -48,7 +48,7 @@ jobs:
       run:
         working-directory: ./frontend
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: volta-cli/action@d253558a6e356722728a10e9a469190de21a83ef
       - name: Install dependencies
         run: yarn --frozen-lockfile
@@ -73,7 +73,7 @@ jobs:
       run:
         working-directory: ./backend
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/cache@v3
         with:
           path: |
@@ -120,7 +120,7 @@ jobs:
       FRONTEND_CHANGED: ${{ needs.changes.outputs.frontend == 'true' || inputs.force_build_frontend == true }}
       BACKEND_CHANGED: ${{ needs.changes.outputs.backend == 'true' || inputs.force_build_backend == true }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
         with:
