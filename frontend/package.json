@@ -17,7 +17,7 @@
   "dependencies": {
     "@heroicons/vue": "^2.0.18",
     "@kyvg/vue3-notification": "^2.9.1",
-    "@tanstack/vue-query": "^4.34.4",
+    "@tanstack/vue-query": "^4.35.3",
     "@vueuse/core": "^10.4.1",
     "axios": "^1.5.0",
     "copy-to-clipboard": "^3.3.3",
@@ -29,13 +29,13 @@
     "vue-router": "^4.2.4"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.9",
+    "@tailwindcss/typography": "^0.5.10",
     "@types/lodash.omit": "^4.5.7",
-    "@types/node": "^18.17.14",
-    "@typescript-eslint/parser": "^6.6.0",
+    "@types/node": "^18.17.16",
+    "@typescript-eslint/parser": "^6.7.0",
     "@vitejs/plugin-vue": "4",
     "autoprefixer": "^10.4.15",
-    "eslint": "8.48.0",
+    "eslint": "8.49.0",
     "eslint-import-resolver-typescript": "^3.6.0",
     "eslint-plugin-import": "2.28.1",
     "eslint-plugin-no-unsanitized": "4.0.2",
@@ -45,18 +45,18 @@
     "postcss": "^8.4.29",
     "postcss-html": "^1.5.0",
     "prettier": "3.0.3",
-    "sass": "^1.66.1",
+    "sass": "^1.67.0",
     "stylelint": "15.10.3",
     "stylelint-config-standard": "34.0.0",
     "stylelint-config-standard-scss": "^10.0.0",
     "stylelint-config-standard-vue": "^1.0.0",
-    "stylelint-scss": "^5.1.0",
+    "stylelint-scss": "^5.2.1",
     "tailwindcss": "^3.3.3",
     "typescript": "^5.2.2",
     "vite": "4.4.9",
     "vue-eslint-parser": "^9.3.1",
     "vue-search-select": "^3.1.2",
-    "vue-tsc": "^1.8.8"
+    "vue-tsc": "^1.8.11"
   },
   "volta": {
     "node": "18.17.1",
