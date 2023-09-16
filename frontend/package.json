@@ -23,7 +23,7 @@
     "copy-to-clipboard": "^3.3.3",
     "daisyui": "3",
     "epic-spinners": "^2.0.0",
-    "nanoid": "^4.0.2",
+    "nanoid": "^5.0.1",
     "vue": "^3.3.4",
     "vue-lottie": "^0.2.1",
     "vue-router": "^4.2.4"
