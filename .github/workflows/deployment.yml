@@ -107,7 +107,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: backend-build-x86-64
-          path: ${{ github.workspace }}/backend/target/release/ots_server
+          path: ${{ github.workspace }}/backend/target/x86_64-unknown-linux-gnu/release/ots_server
           if-no-files-found: error
           retention-days: 1
       - name: Build for arm64
