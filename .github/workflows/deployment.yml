@@ -137,6 +137,8 @@ jobs:
       DEPLOYMENT_NAMESPACE: ots
       DOCKER_BACKEND_IMAGE: taprolabsregistry/ots-backend
       DOCKER_FRONTEND_IMAGE: taprolabsregistry/ots-frontend
+      DOCKER_BACKEND_PLATFORM_amd64: amd64
+      DOCKER_BACKEND_PLATFORM_arm64: arm64
       DOCKER_TAG_NAME: ots-deployment-${{ github.run_number }}
       FRONTEND_CHANGED: ${{ needs.changes.outputs.frontend == 'true' || inputs.force_build_frontend == true }}
       BACKEND_CHANGED: ${{ needs.changes.outputs.backend == 'true' || inputs.force_build_backend == true }}
@@ -169,7 +171,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: backend-build-arm64
-          path: ./backend/target/release/arm64/ # x86-64 build
+          path: ./backend/target/release/arm64/ # arm64 build
 
       - name: 'Download frontend artifact'
         if: ${{ env.FRONTEND_CHANGED == 'true' }}
@@ -182,20 +184,19 @@ jobs:
         if: ${{ env.BACKEND_CHANGED == 'true' }}
         run: |
           cp ./backend/target/release/x86-64/ots_server ./backend/target/release/ots_server
-          docker build -f Dockerfile.backend -t ${{ env.DOCKER_BACKEND_IMAGE }}-amd64-linux:production .
+          docker build --platform linux/amd64 -f Dockerfile.backend -t ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_amd64 }}:production .
 
       - name: 'Build backend docker image arm64'
         if: ${{ env.BACKEND_CHANGED == 'true' }}
         run: |
           cp ./backend/target/release/arm64/ots_server ./backend/target/release/ots_server
-          docker build -f Dockerfile.backend -t ${{ env.DOCKER_BACKEND_IMAGE }}-arm-linux:production .
+          docker build --platform linux/arm64 -f Dockerfile.backend -t ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_arm64 }}:production .
 
       - name: 'Pull latest backend production image if backend was not built'
         if: ${{ env.BACKEND_CHANGED == 'false' }}
         run: |
-          docker pull ${{ env.DOCKER_BACKEND_IMAGE }}:production
-          docker pull ${{ env.DOCKER_BACKEND_IMAGE }}-amd64-linux:production
-          docker pull ${{ env.DOCKER_BACKEND_IMAGE }}-arm-linux:production
+          docker pull ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_amd64 }}:production
+          docker pull ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_arm64 }}:production
 
       - name: 'Build frontend docker image'
         if: ${{ env.FRONTEND_CHANGED == 'true' }}
@@ -207,22 +208,25 @@ jobs:
 
       - name: 'Tag and push backend docker image'
         run: |
-          docker manfiest create ${{ env.DOCKER_BACKEND_IMAGE }}:production \
-            ${{ env.DOCKER_BACKEND_IMAGE }}-amd64-linux:production \
-            ${{ env.DOCKER_BACKEND_IMAGE }}-arm-linux:production
+          docker push ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_amd64 }}:production
+          docker push ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_arm64 }}:production
+          docker manifest create ${{ env.DOCKER_BACKEND_IMAGE }}:production \
+            --amend ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_amd64 }}:production \
+            --amend ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_arm64 }}:production
 
           # tag
-          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}:production ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
-          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}-amd64-linux:production ${{ env.DOCKER_BACKEND_IMAGE }}-amd64-linux:${{ env.DOCKER_TAG_NAME }}
-          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}-arm-linux:production ${{ env.DOCKER_BACKEND_IMAGE }}-arm-linux:${{ env.DOCKER_TAG_NAME }}
+          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_amd64 }}:production ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_amd64 }}:${{ env.DOCKER_TAG_NAME }}
+          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_arm64 }}:production ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_arm64 }}:${{ env.DOCKER_TAG_NAME }}
 
-          # create manifest for runner
-          docker manfiest create ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }} \
-            ${{ env.DOCKER_BACKEND_IMAGE }}-amd64-linux:${{ env.DOCKER_TAG_NAME }} \
-            ${{ env.DOCKER_BACKEND_IMAGE }}-arm-linux:${{ env.DOCKER_TAG_NAME }}
+          # create manifest for runner tag
+          docker push ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_amd64 }}:${{ env.DOCKER_TAG_NAME }}
+          docker push ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_arm64 }}:${{ env.DOCKER_TAG_NAME }}
+          docker manifest create ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }} \
+            --amend ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_amd64 }}:${{ env.DOCKER_TAG_NAME }} \
+            --amend ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_BACKEND_PLATFORM_arm64 }}:${{ env.DOCKER_TAG_NAME }}
 
-          docker manfiest push ${{ env.DOCKER_BACKEND_IMAGE }}:production
-          docker manfiest push ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
+          docker manifest push ${{ env.DOCKER_BACKEND_IMAGE }}:production
+          docker manifest push ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
 
       - name: 'Tag and push frontend docker image'
         run: |
