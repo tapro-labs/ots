@@ -62,7 +62,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  build_backend_x86-64:
+  build_backend:
     needs: changes
     if: |
       always() &&
