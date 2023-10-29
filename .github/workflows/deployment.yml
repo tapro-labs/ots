@@ -97,14 +97,8 @@ jobs:
         run: cargo install cross
       - name: Compute short github commit hash
         run: echo "GITHUB_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-7`" >> $GITHUB_ENV
-      - name: Build project
+      - name: Build for x86-64
         run: make build
-        env:
-          ROCKET_PROFILE: release
-          OTS_BUILD_VERSION: ${{ env.GITHUB_SHORT_SHA }}
-          ENABLED_FEATURES: ${{ vars.ENABLED_FEATURES }}
-      - name: Build for arm64
-        run: make build ARM=true
         env:
           ROCKET_PROFILE: release
           OTS_BUILD_VERSION: ${{ env.GITHUB_SHORT_SHA }}
@@ -116,6 +110,12 @@ jobs:
           path: ${{ github.workspace }}/backend/target/release/ots_server
           if-no-files-found: error
           retention-days: 1
+      - name: Build for arm64
+        run: make build ARM=true
+        env:
+          ROCKET_PROFILE: release
+          OTS_BUILD_VERSION: ${{ env.GITHUB_SHORT_SHA }}
+          ENABLED_FEATURES: ${{ vars.ENABLED_FEATURES }}
       - name: Archive arm binary
         uses: actions/upload-artifact@v3
         with:

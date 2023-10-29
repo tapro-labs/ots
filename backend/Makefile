@@ -2,12 +2,12 @@
 -include .env
 
 BUILD_COMMAND = cargo
-TARGET=x86_64-unknown-linux-gnu
+TARGET = x86_64-unknown-linux-gnu
 APP_FEATURES_ENABLED = $(shell echo ${ENABLED_FEATURES} | sed -E 's/([^,]+)/\1_feature/g')
 
 ifeq ($(ARM),true)
   BUILD_COMMAND = cross
-  TARGET=aarch64-unknown-linux-gnu
+  TARGET = aarch64-unknown-linux-gnu
 endif
 
 ifneq ($(APP_FEATURES_ENABLED),)
