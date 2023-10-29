@@ -62,7 +62,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  build_backend:
+  build_backend_x86-64:
     needs: changes
     if: |
       always() &&
@@ -74,6 +74,12 @@ jobs:
         working-directory: ./backend
     steps:
       - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: "arm64,arm"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - uses: actions/cache@v3
         with:
           path: |
@@ -87,6 +93,8 @@ jobs:
         uses: dtolnay/rust-toolchain@0e66bd3e6b38ec0ad5312288c83e47c143e6b09e
         with:
           toolchain: 1.65
+      - name: Install cross
+        run: cargo install cross
       - name: Compute short github commit hash
         run: echo "GITHUB_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-7`" >> $GITHUB_ENV
       - name: Build project
@@ -95,11 +103,24 @@ jobs:
           ROCKET_PROFILE: release
           OTS_BUILD_VERSION: ${{ env.GITHUB_SHORT_SHA }}
           ENABLED_FEATURES: ${{ vars.ENABLED_FEATURES }}
-      - name: Archive binary
+      - name: Build for arm64
+        run: make build ARM=true
+        env:
+          ROCKET_PROFILE: release
+          OTS_BUILD_VERSION: ${{ env.GITHUB_SHORT_SHA }}
+          ENABLED_FEATURES: ${{ vars.ENABLED_FEATURES }}
+      - name: Archive x86-64 binary
         uses: actions/upload-artifact@v3
         with:
-          name: backend-build
+          name: backend-build-x86-64
           path: ${{ github.workspace }}/backend/target/release/ots_server
+          if-no-files-found: error
+          retention-days: 1
+      - name: Archive arm binary
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-build-arm64
+          path: ${{ github.workspace }}/backend/target/aarch64-unknown-linux-gnu/release/ots_server
           if-no-files-found: error
           retention-days: 1
 
@@ -121,12 +142,6 @@ jobs:
       BACKEND_CHANGED: ${{ needs.changes.outputs.backend == 'true' || inputs.force_build_backend == true }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: "arm64,arm"
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -142,12 +157,19 @@ jobs:
           kubectl config set clusters.taprolabs_cluster.certificate-authority-data "${{ secrets.K8S_SERVER_CA }}"
           kubectl config use-context taprolabs_context
 
-      - name: 'Download backend artifact'
+      - name: 'Download backend artifact x86-64'
         if: ${{ env.BACKEND_CHANGED == 'true' }}
         uses: actions/download-artifact@v3
         with:
-          name: backend-build
-          path: ./backend/target/release/ # ots_server executable will be put under release
+          name: backend-build-x86-64
+          path: ./backend/target/release/x86-64/ # x86-64 build
+
+      - name: 'Download backend artifact arm64'
+        if: ${{ env.BACKEND_CHANGED == 'true' }}
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-build-arm64
+          path: ./backend/target/release/arm64/ # x86-64 build
 
       - name: 'Download frontend artifact'
         if: ${{ env.FRONTEND_CHANGED == 'true' }}
@@ -156,13 +178,24 @@ jobs:
           name: frontend-build
           path: ./frontend/dist/
 
-      - name: 'Build backend docker image'
+      - name: 'Build backend docker image x86-64'
         if: ${{ env.BACKEND_CHANGED == 'true' }}
-        run: docker build -f Dockerfile.backend -t ${{ env.DOCKER_BACKEND_IMAGE }}:production .
+        run: |
+          cp ./backend/target/release/x86-64/ots_server ./backend/target/release/ots_server
+          docker build -f Dockerfile.backend -t ${{ env.DOCKER_BACKEND_IMAGE }}-amd64-linux:production .
+
+      - name: 'Build backend docker image arm64'
+        if: ${{ env.BACKEND_CHANGED == 'true' }}
+        run: |
+          cp ./backend/target/release/arm64/ots_server ./backend/target/release/ots_server
+          docker build -f Dockerfile.backend -t ${{ env.DOCKER_BACKEND_IMAGE }}-arm-linux:production .
 
       - name: 'Pull latest backend production image if backend was not built'
         if: ${{ env.BACKEND_CHANGED == 'false' }}
-        run: docker pull ${{ env.DOCKER_BACKEND_IMAGE }}:production
+        run: |
+          docker pull ${{ env.DOCKER_BACKEND_IMAGE }}:production
+          docker pull ${{ env.DOCKER_BACKEND_IMAGE }}-amd64-linux:production
+          docker pull ${{ env.DOCKER_BACKEND_IMAGE }}-arm-linux:production
 
       - name: 'Build frontend docker image'
         if: ${{ env.FRONTEND_CHANGED == 'true' }}
@@ -174,9 +207,22 @@ jobs:
 
       - name: 'Tag and push backend docker image'
         run: |
+          docker manfiest create ${{ env.DOCKER_BACKEND_IMAGE }}:production \
+            ${{ env.DOCKER_BACKEND_IMAGE }}-amd64-linux:production \
+            ${{ env.DOCKER_BACKEND_IMAGE }}-arm-linux:production
+
+          # tag
           docker tag ${{ env.DOCKER_BACKEND_IMAGE }}:production ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
-          docker push ${{ env.DOCKER_BACKEND_IMAGE }}:production
-          docker push ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
+          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}-amd64-linux:production ${{ env.DOCKER_BACKEND_IMAGE }}-amd64-linux:${{ env.DOCKER_TAG_NAME }}
+          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}-arm-linux:production ${{ env.DOCKER_BACKEND_IMAGE }}-arm-linux:${{ env.DOCKER_TAG_NAME }}
+
+          # create manifest for runner
+          docker manfiest create ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }} \
+            ${{ env.DOCKER_BACKEND_IMAGE }}-amd64-linux:${{ env.DOCKER_TAG_NAME }} \
+            ${{ env.DOCKER_BACKEND_IMAGE }}-arm-linux:${{ env.DOCKER_TAG_NAME }}
+
+          docker manfiest push ${{ env.DOCKER_BACKEND_IMAGE }}:production
+          docker manfiest push ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
 
       - name: 'Tag and push frontend docker image'
         run: |
