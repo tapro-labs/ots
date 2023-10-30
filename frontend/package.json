@@ -17,7 +17,7 @@
   "dependencies": {
     "@heroicons/vue": "^2.0.18",
     "@kyvg/vue3-notification": "^2.9.1",
-    "@tanstack/vue-query": "^4.35.7",
+    "@tanstack/vue-query": "^4.36.1",
     "@vueuse/core": "^10.4.1",
     "axios": "^1.5.1",
     "copy-to-clipboard": "^3.3.3",
