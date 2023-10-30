@@ -206,8 +206,8 @@ jobs:
       - name: 'Build frontend docker image'
         if: ${{ env.FRONTEND_CHANGED == 'true' }}
         run: |
-          docker build --platform linux/amd64 -f Dockerfile.frontend -t ${{ env.DOCKER_FRONTEND_IMAGE }}:production .
-          docker build --platform linux/arm64 -f Dockerfile.frontend -t ${{ env.DOCKER_FRONTEND_IMAGE }}:production .
+          docker build --platform linux/amd64 -f Dockerfile.frontend -t ${{ env.DOCKER_FRONTEND_IMAGE }}-${{ env.DOCKER_PLATFORM_amd64 }}:production .
+          docker build --platform linux/arm64 -f Dockerfile.frontend -t ${{ env.DOCKER_FRONTEND_IMAGE }}-${{ env.DOCKER_PLATFORM_arm64 }}:production .
 
       - name: 'Pull latest frontend production image if frontend was not built'
         if: ${{ env.FRONTEND_CHANGED == 'false' }}
