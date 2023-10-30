@@ -205,39 +205,40 @@ jobs:
 
       - name: 'Build frontend docker image'
         if: ${{ env.FRONTEND_CHANGED == 'true' }}
-        run: docker build -f Dockerfile.frontend -t ${{ env.DOCKER_FRONTEND_IMAGE }}:production .
+        run: |
+          docker build --platform linux/amd64 -f Dockerfile.frontend -t ${{ env.DOCKER_FRONTEND_IMAGE }}:production .
+          docker build --platform linux/arm64 -f Dockerfile.frontend -t ${{ env.DOCKER_FRONTEND_IMAGE }}:production .
 
       - name: 'Pull latest frontend production image if frontend was not built'
         if: ${{ env.FRONTEND_CHANGED == 'false' }}
-        run: docker pull ${{ env.DOCKER_FRONTEND_IMAGE }}:production
-
-      - name: 'Tag and push backend docker image'
         run: |
-          docker push ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_PLATFORM_amd64 }}:production
-          docker push ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_PLATFORM_arm64 }}:production
-          docker manifest create ${{ env.DOCKER_BACKEND_IMAGE }}:production \
-            --amend ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_PLATFORM_amd64 }}:production \
-            --amend ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_PLATFORM_arm64 }}:production
+          docker pull ${{ env.DOCKER_FRONTEND_IMAGE }}-${{ env.DOCKER_PLATFORM_amd64 }}:production
+          docker pull ${{ env.DOCKER_FRONTEND_IMAGE }}-${{ env.DOCKER_PLATFORM_arm64 }}:production
 
-          # tag
-          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_PLATFORM_amd64 }}:production ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_PLATFORM_amd64 }}:${{ env.DOCKER_TAG_NAME }}
-          docker tag ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_PLATFORM_arm64 }}:production ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_PLATFORM_arm64 }}:${{ env.DOCKER_TAG_NAME }}
-
-          # create manifest for runner tag
-          docker push ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_PLATFORM_amd64 }}:${{ env.DOCKER_TAG_NAME }}
-          docker push ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_PLATFORM_arm64 }}:${{ env.DOCKER_TAG_NAME }}
-          docker manifest create ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }} \
-            --amend ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_PLATFORM_amd64 }}:${{ env.DOCKER_TAG_NAME }} \
-            --amend ${{ env.DOCKER_BACKEND_IMAGE }}-${{ env.DOCKER_PLATFORM_arm64 }}:${{ env.DOCKER_TAG_NAME }}
-
-          docker manifest push ${{ env.DOCKER_BACKEND_IMAGE }}:production
-          docker manifest push ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
-
-      - name: 'Tag and push frontend docker image'
+      - name: 'Tag and push docker images'
         run: |
-          docker tag ${{ env.DOCKER_FRONTEND_IMAGE }}:production ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
-          docker push ${{ env.DOCKER_FRONTEND_IMAGE }}:production
-          docker push ${{ env.DOCKER_FRONTEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
+          images=(${{ env.DOCKER_BACKEND_IMAGE }} ${{ env.DOCKER_FRONTEND_IMAGE }})
+          for image in ${images[@]}; do
+            docker push $image-${{ env.DOCKER_PLATFORM_amd64 }}:production
+            docker push $image-${{ env.DOCKER_PLATFORM_arm64 }}:production
+            docker manifest create $image:production \
+              --amend $image-${{ env.DOCKER_PLATFORM_amd64 }}:production \
+              --amend $image-${{ env.DOCKER_PLATFORM_arm64 }}:production
+
+            # tag
+            docker tag $image-${{ env.DOCKER_PLATFORM_amd64 }}:production $image-${{ env.DOCKER_PLATFORM_amd64 }}:${{ env.DOCKER_TAG_NAME }}
+            docker tag $image-${{ env.DOCKER_PLATFORM_arm64 }}:production $image-${{ env.DOCKER_PLATFORM_arm64 }}:${{ env.DOCKER_TAG_NAME }}
+
+            # create manifest for runner tag
+            docker push $image-${{ env.DOCKER_PLATFORM_amd64 }}:${{ env.DOCKER_TAG_NAME }}
+            docker push $image-${{ env.DOCKER_PLATFORM_arm64 }}:${{ env.DOCKER_TAG_NAME }}
+            docker manifest create ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }} \
+              --amend $image-${{ env.DOCKER_PLATFORM_amd64 }}:${{ env.DOCKER_TAG_NAME }} \
+              --amend $image-${{ env.DOCKER_PLATFORM_arm64 }}:${{ env.DOCKER_TAG_NAME }}
+
+            docker manifest push $image:production
+            docker manifest push $image:${{ env.DOCKER_TAG_NAME }}
+          done
 
       - name: 'Deploy'
         run: |
