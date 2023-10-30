@@ -232,7 +232,7 @@ jobs:
             # create manifest for runner tag
             docker push $image-${{ env.DOCKER_PLATFORM_amd64 }}:${{ env.DOCKER_TAG_NAME }}
             docker push $image-${{ env.DOCKER_PLATFORM_arm64 }}:${{ env.DOCKER_TAG_NAME }}
-            docker manifest create ${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }} \
+            docker manifest create $image:${{ env.DOCKER_TAG_NAME }} \
               --amend $image-${{ env.DOCKER_PLATFORM_amd64 }}:${{ env.DOCKER_TAG_NAME }} \
               --amend $image-${{ env.DOCKER_PLATFORM_arm64 }}:${{ env.DOCKER_TAG_NAME }}
 
