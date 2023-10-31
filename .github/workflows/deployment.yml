@@ -155,15 +155,6 @@ jobs:
         with:
           platforms: "arm64,arm"
 
-      - name: 'Set k8s cluster config'
-        run: |
-          kubectl config set-cluster taprolabs_cluster --server=${{ secrets.K8S_SERVER_URL }}
-          kubectl config set-context taprolabs_context --cluster=taprolabs_cluster
-          kubectl config set-credentials github_deployer --token=${{ secrets.K8S_DEPLOYER_ACCOUNT_TOKEN }}
-          kubectl config set-context taprolabs_context --user=github_deployer
-          kubectl config set clusters.taprolabs_cluster.certificate-authority-data "${{ secrets.K8S_SERVER_CA }}"
-          kubectl config use-context taprolabs_context
-
       - name: 'Download backend artifact x86-64'
         if: ${{ env.BACKEND_CHANGED == 'true' }}
         uses: actions/download-artifact@v3
@@ -239,8 +230,3 @@ jobs:
             docker manifest push $image:production
             docker manifest push $image:${{ env.DOCKER_TAG_NAME }}
           done
-
-      - name: 'Deploy'
-        run: |
-          kubectl set image deployment/ots-backend -n ${{ env.DEPLOYMENT_NAMESPACE }} ots-backend=${{ env.DOCKER_BACKEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
-          kubectl set image deployment/ots-frontend -n ${{ env.DEPLOYMENT_NAMESPACE }} ots-frontend=${{ env.DOCKER_FRONTEND_IMAGE }}:${{ env.DOCKER_TAG_NAME }}
