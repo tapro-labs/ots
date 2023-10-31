@@ -4,6 +4,7 @@
 
     <div class="flex">
       <input :value="secretUrl" autofocus class="input w-full rounded-r-none" disabled />
+      <qr-code class="rounded-r-none border-r-1 border-r-black" :text="secretUrl" />
       <copy-to-clipboard :text="secretUrl" success-message="Successfully copied link to clipboard!" />
     </div>
 
@@ -23,11 +24,17 @@ import { defineComponent, PropType } from 'vue';
  * Internal dependencies.
  */
 import { SecretId } from '@/types/SecretTypes';
+import QrCode from '@/components/QrCode/QrCode.vue';
 import CopyToClipboard from '@/components/CopyToClipboard/CopyToClipboard.vue';
 
 export default defineComponent({
   name: 'CopySecret',
-  components: { CopyToClipboard },
+
+  components: {
+    QrCode,
+    CopyToClipboard,
+  },
+
   props: {
     secretUrl: {
       type: String as PropType<SecretId>,

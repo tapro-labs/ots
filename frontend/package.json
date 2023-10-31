@@ -24,6 +24,7 @@
     "daisyui": "3",
     "epic-spinners": "^2.0.0",
     "nanoid": "^4.0.2",
+    "qrcode.vue": "^3.4.1",
     "vue": "^3.3.4",
     "vue-lottie": "^0.2.1",
     "vue-router": "^4.2.5"
