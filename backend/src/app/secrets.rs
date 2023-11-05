@@ -44,7 +44,7 @@ fn store_secret(
     match redis_store.store_for_a_period(format!("secret:{}", id), &data.secret, Time::from_days(1))
     {
         Ok(_) => Ok(Json(CreateSecretResponse::new(id))),
-        _ => Err(BadRequest(None)),
+        _ => Err(BadRequest("Failed to create secret response".into())),
     }
 }
 
