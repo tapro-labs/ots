@@ -25,7 +25,7 @@ impl<'r> FromRequest<'r> for SlackAccessToken {
         match authorization {
             Some(authorization) => {
                 if !authorization.contains("Bearer") {
-                    return Outcome::Failure((Status::Unauthorized, AccessTokenError::Missing));
+                    return Outcome::Error((Status::Unauthorized, AccessTokenError::Missing));
                 }
 
                 let id: &str = authorization
@@ -53,9 +53,9 @@ impl<'r> FromRequest<'r> for SlackAccessToken {
                     }
                 }
 
-                Outcome::Failure((Status::Unauthorized, AccessTokenError::Invalid))
+                Outcome::Error((Status::Unauthorized, AccessTokenError::Invalid))
             }
-            _ => Outcome::Failure((Status::Unauthorized, AccessTokenError::Missing)),
+            _ => Outcome::Error((Status::Unauthorized, AccessTokenError::Missing)),
         }
     }
 }
