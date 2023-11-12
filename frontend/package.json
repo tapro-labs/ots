@@ -21,7 +21,7 @@
     "@vueuse/core": "^10.6.0",
     "axios": "^1.6.1",
     "copy-to-clipboard": "^3.3.3",
-    "daisyui": "3",
+    "daisyui": "4",
     "epic-spinners": "^2.0.0",
     "nanoid": "^4.0.2",
     "qrcode.vue": "^3.4.1",
