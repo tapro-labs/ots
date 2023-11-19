@@ -18,8 +18,8 @@
     "@heroicons/vue": "^2.0.18",
     "@kyvg/vue3-notification": "^2.9.1",
     "@tanstack/vue-query": "^4.37.1",
-    "@vueuse/core": "^10.6.0",
-    "axios": "^1.6.1",
+    "@vueuse/core": "^10.6.1",
+    "axios": "^1.6.2",
     "copy-to-clipboard": "^3.3.3",
     "daisyui": "3",
     "epic-spinners": "^2.0.0",
@@ -32,11 +32,11 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.10",
     "@types/lodash.omit": "^4.5.9",
-    "@types/node": "^18.18.9",
-    "@typescript-eslint/parser": "^6.10.0",
+    "@types/node": "^18.18.10",
+    "@typescript-eslint/parser": "^6.11.0",
     "@vitejs/plugin-vue": "4",
     "autoprefixer": "^10.4.16",
-    "eslint": "8.53.0",
+    "eslint": "8.54.0",
     "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "2.29.0",
     "eslint-plugin-no-unsanitized": "4.0.2",
@@ -45,7 +45,7 @@
     "lodash.omit": "^4.5.0",
     "postcss": "^8.4.31",
     "postcss-html": "^1.5.0",
-    "prettier": "3.0.3",
+    "prettier": "3.1.0",
     "sass": "^1.69.5",
     "stylelint": "15.11.0",
     "stylelint-config-standard": "34.0.0",
@@ -61,10 +61,10 @@
   },
   "volta": {
     "node": "18.18.2",
-    "yarn": "1.22.19"
+    "yarn": "1.22.21"
   },
   "engines": {
     "node": ">= 18.18.2",
-    "yarn": ">= 1.22.19"
+    "yarn": ">= 1.22.21"
   }
 }
