@@ -6,6 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-redis = { version = "0.23" }
+redis = { version = "0.24" }
 envconfig = { workspace = true }
 utils = { workspace = true }
