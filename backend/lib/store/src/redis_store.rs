@@ -60,7 +60,15 @@ impl RedisStore {
         time: Time,
     ) -> RedisResult<()> {
         self.store(&key, value)?;
-        self.connection.pexpire(&key, time.as_ms())
+
+        // We try to cast to i64
+        // we check here for this edge case, as new redis versions require i64
+        // instead of u64 or usize for some reason
+        if let Ok(expiration) = time.as_ms().try_into() {
+            return self.connection.pexpire(&key, expiration);
+        }
+
+        panic!("It seems we reached the end of time...");
     }
 
     pub fn forget<K: ToRedisArgs>(&mut self, key: K) -> RedisResult<()> {
