@@ -55,7 +55,7 @@ jobs:
       - name: Build app
         run: cp .env.example .env && yarn build
       - name: Archive dist folder
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-build
           path: ${{ github.workspace }}/frontend/dist/
@@ -104,7 +104,7 @@ jobs:
           OTS_BUILD_VERSION: ${{ env.GITHUB_SHORT_SHA }}
           ENABLED_FEATURES: ${{ vars.ENABLED_FEATURES }}
       - name: Archive x86-64 binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-build-x86-64
           path: ${{ github.workspace }}/backend/target/x86_64-unknown-linux-gnu/release/ots_server
@@ -117,7 +117,7 @@ jobs:
           OTS_BUILD_VERSION: ${{ env.GITHUB_SHORT_SHA }}
           ENABLED_FEATURES: ${{ vars.ENABLED_FEATURES }}
       - name: Archive arm binary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-build-arm64
           path: ${{ github.workspace }}/backend/target/aarch64-unknown-linux-gnu/release/ots_server
