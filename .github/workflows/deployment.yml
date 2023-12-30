@@ -157,21 +157,21 @@ jobs:
 
       - name: 'Download backend artifact x86-64'
         if: ${{ env.BACKEND_CHANGED == 'true' }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend-build-x86-64
           path: ./backend/target/release/x86-64/ # x86-64 build
 
       - name: 'Download backend artifact arm64'
         if: ${{ env.BACKEND_CHANGED == 'true' }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend-build-arm64
           path: ./backend/target/release/arm64/ # arm64 build
 
       - name: 'Download frontend artifact'
         if: ${{ env.FRONTEND_CHANGED == 'true' }}
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend-build
           path: ./frontend/dist/
