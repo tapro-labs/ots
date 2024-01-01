@@ -25,7 +25,7 @@
     "epic-spinners": "^2.0.0",
     "nanoid": "^4.0.2",
     "qrcode.vue": "^3.4.1",
-    "vue": "^3.4.1",
+    "vue": "^3.4.3",
     "vue-lottie": "^0.2.1",
     "vue-router": "^4.2.5"
   },
@@ -33,7 +33,7 @@
     "@tailwindcss/typography": "^0.5.10",
     "@types/lodash.omit": "^4.5.9",
     "@types/node": "^18.19.4",
-    "@typescript-eslint/parser": "^6.16.0",
+    "@typescript-eslint/parser": "^6.17.0",
     "@vitejs/plugin-vue": "4",
     "autoprefixer": "^10.4.16",
     "eslint": "8.56.0",
