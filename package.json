@@ -10,7 +10,7 @@
     "url": "git@KaloyanYosifov.github.com:tapro-labs/one-time-secret.git"
   },
   "devDependencies": {
-    "husky": "^8.0.3",
+    "husky": "^9.0.10",
     "lint-staged": "15.0.0"
   },
   "volta": {
