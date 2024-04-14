@@ -503,9 +503,9 @@ checksum = "9b919933a397b79c37e33b77bb2aa3dc8eb6e165ad809e58ff75bc7db2e34574"
 
 [[package]]
 name = "h2"
-version = "0.3.17"
+version = "0.3.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "66b91535aa35fea1523ad1b86cb6b53c28e0ae566ba4a460f4457e936cad7c6f"
+checksum = "81fe527a889e1532da5c525686d96d4c2e74cdd345badf8dfef9f6b39dd5f5e8"
 dependencies = [
  "bytes",
  "fnv",
@@ -513,7 +513,7 @@ dependencies = [
  "futures-sink",
  "futures-util",
  "http 0.2.8",
- "indexmap 1.9.1",
+ "indexmap",
  "slab",
  "tokio",
  "tokio-util",
@@ -532,18 +532,12 @@ dependencies = [
  "futures-sink",
  "futures-util",
  "http 1.1.0",
- "indexmap 2.1.0",
+ "indexmap",
  "slab",
  "tokio",
  "tokio-util",
  "tracing",
 ]
-
-[[package]]
-name = "hashbrown"
-version = "0.12.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8a9ee70c43aaf417c914396645a0fa852624801b24ebb7ae78fe8272889ac888"
 
 [[package]]
 name = "hashbrown"
@@ -662,7 +656,7 @@ dependencies = [
  "futures-channel",
  "futures-core",
  "futures-util",
- "h2 0.3.17",
+ "h2 0.3.26",
  "http 0.2.8",
  "http-body 0.4.5",
  "httparse",
@@ -744,22 +738,12 @@ dependencies = [
 
 [[package]]
 name = "indexmap"
-version = "1.9.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "10a35a97730320ffe8e2d410b5d3b69279b98d2c14bdb8b70ea89ecf7888d41e"
-dependencies = [
- "autocfg",
- "hashbrown 0.12.3",
-]
-
-[[package]]
-name = "indexmap"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d530e1a18b1cb4c484e6e34556a0d948706958449fca0cab753d649f2bce3d1f"
 dependencies = [
  "equivalent",
- "hashbrown 0.14.2",
+ "hashbrown",
  "serde",
 ]
 
@@ -1375,7 +1359,7 @@ dependencies = [
  "either",
  "figment",
  "futures",
- "indexmap 2.1.0",
+ "indexmap",
  "log",
  "memchr",
  "multer",
@@ -1407,7 +1391,7 @@ checksum = "a2238066abf75f21be6cd7dc1a09d5414a671f4246e384e49fe3f8a4936bd04c"
 dependencies = [
  "devise",
  "glob",
- "indexmap 2.1.0",
+ "indexmap",
  "proc-macro2",
  "quote",
  "rocket_http",
@@ -1427,7 +1411,7 @@ dependencies = [
  "futures",
  "http 0.2.8",
  "hyper 0.14.20",
- "indexmap 2.1.0",
+ "indexmap",
  "log",
  "memchr",
  "pear",
