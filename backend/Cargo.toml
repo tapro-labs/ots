@@ -23,10 +23,10 @@ members = ["features/*", "lib/*"]
 [workspace.dependencies]
 store = { path = "./lib/store" }
 utils = { path = "./lib/utils" }
-rocket = { version = "0.5.0", features = ["secrets", "json", "tls"] }
-serde = { version = "1.0", features = ["derive"] }
+rocket = { version = "0.5.1", features = ["secrets", "json", "tls"] }
+serde = { version = "1.0.202", features = ["derive"] }
 uuid = { version = "1.8", features = ["v4"] }
-reqwest = { version = "0.12", features = ["blocking", "json"] }
+reqwest = { version = "0.12.4", features = ["blocking", "json"] }
 envconfig = { version = "0.10" }
 
 
