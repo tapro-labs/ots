@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
-      - uses: volta-cli/action@d253558a6e356722728a10e9a469190de21a83ef
+      - uses: volta-cli/action@5c175f92dea6f48441c436471e6479dbc192e194
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
@@ -41,7 +41,7 @@ jobs:
         working-directory: ./frontend
     steps:
       - uses: actions/checkout@v4
-      - uses: volta-cli/action@d253558a6e356722728a10e9a469190de21a83ef
+      - uses: volta-cli/action@5c175f92dea6f48441c436471e6479dbc192e194
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Linting
