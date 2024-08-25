@@ -50,6 +50,7 @@ import { computed, defineComponent, Ref, ref, watch } from 'vue';
 /**
  * Internal dependencies.
  */
+import { Base64 } from 'js-base64';
 import useCreateSecret from '@/composables/useCreateSecret';
 import SelectSlackUser from '@/pages/Home/components/SelectSlackUser/SelectSlackUser.vue';
 import useApiToken from '@/composables/integrations/slack/useApiToken';
@@ -124,7 +125,7 @@ export default defineComponent({
 
         const secretKey = await createEncryptionKey(DEFAULT_SECRET_LENGTH);
         const secretId = await createSecret({ data: stream, key: secretKey });
-        const cryptograhyDetails = window.btoa(JSON.stringify({ secretKey, secretInfo }));
+        const cryptograhyDetails = Base64.btoa(JSON.stringify({ secretKey, secretInfo }));
         const secretUrl = window.location.origin + '/secret/' + secretId + '#' + cryptograhyDetails;
 
         // reset secret
@@ -183,7 +184,9 @@ export default defineComponent({
       fileInfo.value = null;
       stream = new ReadableStream({
         pull(controller) {
-          controller.enqueue(Uint8Array.from(newValue.split('').map(x => x.charCodeAt(0))));
+          const textEncoder = new TextEncoder();
+
+          controller.enqueue(textEncoder.encode(newValue));
           controller.close();
         },
       });

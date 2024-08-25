@@ -64,6 +64,7 @@ import { computed, ComputedRef, defineComponent, ref, watch } from 'vue';
 /**
  * Internal dependencies.
  */
+import { Base64 } from 'js-base64';
 import { SecretId } from '@/types/SecretTypes';
 import useFetchSecret from '@/composables/useFetchSecret';
 import TheHeader from '@/components/TheHeader/TheHeader.vue';
@@ -71,7 +72,7 @@ import { SecretCryptograhyKey } from '@/utils/cryptography';
 import useDecryptData from '@/composables/useDecryptData';
 import EncryptStreamTransformer from '@/stream-transformers/EncryptStreamTransformer';
 import GenericStreamTransformation from '@/stream-transformers/GenericStreamTransformation';
-import { base64ToUint8Array } from '@/utils/helpers';
+import { base64ToString, base64ToUint8Array } from '@/utils/helpers';
 
 export default defineComponent({
   name: 'Secret',
@@ -96,7 +97,7 @@ export default defineComponent({
       secretInfo: { type: string; info?: any };
     }> = computed(() => {
       try {
-        return JSON.parse(window.atob(route.hash.replace('#', '')));
+        return JSON.parse(Base64.atob(route.hash.replace('#', '')));
       } catch (a) {
         return { secretKey: '', secretInfo: { type: 'plain' } };
       }
@@ -157,7 +158,7 @@ export default defineComponent({
 
         if (cryptographyDetails.value.secretInfo.type === 'plain') {
           let secretData = '';
-          const reader = stream.pipeThrough(new GenericStreamTransformation(window.atob)).getReader();
+          const reader = stream.pipeThrough(new GenericStreamTransformation(base64ToString)).getReader();
           let read: any;
 
           do {
