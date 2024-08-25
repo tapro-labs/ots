@@ -183,7 +183,9 @@ export default defineComponent({
       fileInfo.value = null;
       stream = new ReadableStream({
         pull(controller) {
-          controller.enqueue(Uint8Array.from(newValue.split('').map(x => x.charCodeAt(0))));
+          const textEncoder = new TextEncoder();
+
+          controller.enqueue(textEncoder.encode(newValue));
           controller.close();
         },
       });

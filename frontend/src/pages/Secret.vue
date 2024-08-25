@@ -71,7 +71,7 @@ import { SecretCryptograhyKey } from '@/utils/cryptography';
 import useDecryptData from '@/composables/useDecryptData';
 import EncryptStreamTransformer from '@/stream-transformers/EncryptStreamTransformer';
 import GenericStreamTransformation from '@/stream-transformers/GenericStreamTransformation';
-import { base64ToUint8Array } from '@/utils/helpers';
+import { base64ToString, base64ToUint8Array } from '@/utils/helpers';
 
 export default defineComponent({
   name: 'Secret',
@@ -157,7 +157,7 @@ export default defineComponent({
 
         if (cryptographyDetails.value.secretInfo.type === 'plain') {
           let secretData = '';
-          const reader = stream.pipeThrough(new GenericStreamTransformation(window.atob)).getReader();
+          const reader = stream.pipeThrough(new GenericStreamTransformation(base64ToString)).getReader();
           let read: any;
 
           do {

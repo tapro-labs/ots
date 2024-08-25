@@ -65,6 +65,7 @@ export const decrypt = async (secret: SecretCryptograhyKey, encryptedData: strin
     const decrypted = await window.crypto.subtle.decrypt({ name: ENCRYPTION_ALGORITHM, iv }, key, encryptedBytes);
     const decoder = new TextDecoder();
 
+    console.log(decrypted);
     return decoder.decode(decrypted);
   } catch (e) {
     console.error(e);

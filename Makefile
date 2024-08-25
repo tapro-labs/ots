@@ -11,10 +11,10 @@ dev_backend:
 	cd backend && make dev
 
 start_docker:
-	docker-compose up -d
+	docker compose up -d
 
 stop_docker:
-	docker-compose down
+	docker compose down
 
 generate_ssl:
 	./server_ssl/generate-ssl.sh
