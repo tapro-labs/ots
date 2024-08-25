@@ -6,7 +6,7 @@ TARGET = x86_64-unknown-linux-gnu
 APP_FEATURES_ENABLED = $(shell echo ${ENABLED_FEATURES} | sed -E 's/([^,]+)/\1_feature/g')
 
 ifeq ($(ARM),true)
-  BUILD_COMMAND = cross
+  BUILD_COMMAND = CROSS_CONTAINER_OPTS="--platform linux/arm64" cross
   TARGET = aarch64-unknown-linux-gnu
 endif
 
