@@ -1,3 +1,6 @@
+import { Base64 } from 'js-base64';
+import { base64ToUint8Array, decodeText, encodeText, uint8ArrayToBase64 } from '@/utils/helpers';
+
 export type SecretCryptograhyKey = JsonWebKey;
 
 export const DEFAULT_IV_LENGTH = 12;
@@ -37,12 +40,7 @@ export const encrypt = async (secret: SecretCryptograhyKey, data: string): Promi
     ivAndEncryptedData.set(iv);
     ivAndEncryptedData.set(encryptedData, iv.length);
 
-    // Convert the encrypted data to a base64 string
-    return window.btoa(
-      Array.from(ivAndEncryptedData)
-        .map(byte => String.fromCharCode(byte))
-        .join('')
-    );
+    return uint8ArrayToBase64(ivAndEncryptedData);
   } catch (e) {
     console.error(e);
 
@@ -54,19 +52,12 @@ export const encrypt = async (secret: SecretCryptograhyKey, data: string): Promi
 export const decrypt = async (secret: SecretCryptograhyKey, encryptedData: string): Promise<string> => {
   try {
     const key = await convertToCryptoKey(secret);
-    const ivAndEncryptedData = new Uint8Array(
-      window
-        .atob(encryptedData)
-        .split('')
-        .map(char => char.charCodeAt(0))
-    );
+    const ivAndEncryptedData = base64ToUint8Array(encryptedData);
     const iv = ivAndEncryptedData.slice(0, DEFAULT_IV_LENGTH);
     const encryptedBytes = ivAndEncryptedData.slice(DEFAULT_IV_LENGTH);
     const decrypted = await window.crypto.subtle.decrypt({ name: ENCRYPTION_ALGORITHM, iv }, key, encryptedBytes);
-    const decoder = new TextDecoder();
 
-    console.log(decrypted);
-    return decoder.decode(decrypted);
+    return decodeText(decrypted);
   } catch (e) {
     console.error(e);
 

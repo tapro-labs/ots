@@ -64,6 +64,7 @@ import { computed, ComputedRef, defineComponent, ref, watch } from 'vue';
 /**
  * Internal dependencies.
  */
+import { Base64 } from 'js-base64';
 import { SecretId } from '@/types/SecretTypes';
 import useFetchSecret from '@/composables/useFetchSecret';
 import TheHeader from '@/components/TheHeader/TheHeader.vue';
@@ -96,7 +97,7 @@ export default defineComponent({
       secretInfo: { type: string; info?: any };
     }> = computed(() => {
       try {
-        return JSON.parse(window.atob(route.hash.replace('#', '')));
+        return JSON.parse(Base64.atob(route.hash.replace('#', '')));
       } catch (a) {
         return { secretKey: '', secretInfo: { type: 'plain' } };
       }

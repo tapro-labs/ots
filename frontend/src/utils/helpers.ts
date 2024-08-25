@@ -16,3 +16,10 @@ export const base64ToString = (base64String: string): string => {
 
   return new TextDecoder().decode(bytes);
 };
+
+export const encodeText = (text: string): Uint8Array => {
+  return new TextEncoder().encode(text);
+};
+export const decodeText = (text: Uint8Array | ArrayBuffer): string => {
+  return new TextDecoder().decode(text);
+};
