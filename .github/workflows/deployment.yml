@@ -43,7 +43,7 @@ jobs:
       always() &&
       needs.changes.outputs.frontend == 'true' ||
       inputs.force_build_frontend == true
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ./frontend
@@ -68,7 +68,7 @@ jobs:
       always() &&
       needs.changes.outputs.backend == 'true' ||
       inputs.force_build_backend == true
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: ./backend
@@ -125,7 +125,7 @@ jobs:
           retention-days: 1
 
   deploy:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs: [changes, build_backend, build_frontend]
     if: |
       always() &&
