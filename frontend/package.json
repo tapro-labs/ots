@@ -33,7 +33,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.13",
     "@types/lodash.omit": "^4.5.9",
-    "@types/node": "^18.19.33",
+    "@types/node": "^22.13.8",
     "@typescript-eslint/parser": "^7.16.0",
     "@vitejs/plugin-vue": "4.6.2",
     "autoprefixer": "^10.4.19",
