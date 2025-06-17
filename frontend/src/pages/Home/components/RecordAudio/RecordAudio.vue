@@ -52,7 +52,8 @@ export default defineComponent({
       }
 
       try {
-        mediaRecorder = new MediaRecorder(await navigator.mediaDevices.getUserMedia({ audio: true }));
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
         const audioChunks: any[] = [];
 
         mediaRecorder.ondataavailable = event => {
@@ -62,6 +63,8 @@ export default defineComponent({
         };
 
         mediaRecorder.onstop = () => {
+          stream?.getTracks()?.forEach(track => track.stop());
+
           const blob = new Blob(audioChunks, { type: 'audio/webm' });
           emit('onStream', blob);
         };
@@ -70,7 +73,9 @@ export default defineComponent({
 
         isRecording.value = true;
       } catch (e: any) {
-        await setErrorMessage(e.message || 'Failed to record!');
+        await setErrorMessage({
+          message: e.message || 'Failed to record!',
+        });
       }
     };
 
