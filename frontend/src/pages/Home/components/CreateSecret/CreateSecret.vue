@@ -109,7 +109,7 @@ export default defineComponent({
     const selectedSlackUser: Ref<SlackUser | null> = ref(null);
     const hasError = ref(false);
     const secret = ref('');
-    const createSecretState = ref('RECORDING');
+    const createSecretState = ref('INITIAL');
     const fileInfo: Ref<FileInfo | null> = ref(null);
     const isSlackCreateMethod = computed(() => createMethod.value === ShareMethod.SLACK);
     const { createSecret, isCreating } = useCreateSecret();
@@ -173,6 +173,10 @@ export default defineComponent({
       }
     };
     const isButtonDisabled = computed(() => {
+      if (showRecording.value) {
+        return true;
+      }
+
       if (createMethod.value !== 'slack') {
         return false;
       }
