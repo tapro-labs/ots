@@ -25,7 +25,7 @@ jobs:
               - 'frontend/**'
 
   base_check:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: volta-cli/action@d253558a6e356722728a10e9a469190de21a83ef
@@ -35,7 +35,7 @@ jobs:
   frontend_check:
     needs: changes
     if: ${{ needs.changes.outputs.frontend == 'true' }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./frontend
@@ -52,7 +52,7 @@ jobs:
   backend_check:
     needs: changes
     if: ${{ needs.changes.outputs.backend == 'true' }}
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./backend
