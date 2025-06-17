@@ -2,7 +2,9 @@
   <dropzone :validation="fileValidation" @error="$emit('error', $event)" @success="$emit('success', $event)">
     <template #default="{ inputId }">
       <div class="relative" v-bind="$attrs">
-        <div class="absolute top-2 right-4">
+        <div class="absolute flex gap-4 top-2 right-4">
+          <slot name="icons" />
+
           <div class="tooltip" data-tip="Drag or Upload a file">
             <label :for="inputId" class="cursor-pointer hover:opacity-60">
               <upload-icon class="h-6 w-6 text-black" />

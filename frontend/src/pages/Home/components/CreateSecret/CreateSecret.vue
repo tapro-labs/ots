@@ -2,7 +2,15 @@
   <div class="prose max-w-full">
     <h3 class="card-title">Create a secret below</h3>
 
-    <file-input class="mb-4" max-size="40MB" @error="onFileError" @success="onFile">
+    <record-audio v-if="showRecording" @on-stream="onAudioStream" />
+
+    <file-input v-else class="mb-4" max-size="40MB" @error="onFileError" @success="onFile">
+      <template #icons>
+        <div class="cursor-pointer" @click="recordAudio">
+          <microphone-icon class="h-6 w-6 text-black" />
+        </div>
+      </template>
+
       <div v-if="!fileInfo" class="form-control">
         <textarea
           v-model="secret"
@@ -19,6 +27,8 @@
 
       <div v-else class="form-control droppable-indicator">
         You have uploaded a file: <strong>{{ fileInfo.name }}</strong>
+
+        <audio-player v-if="isAudioRecording && audioStream" :blob="audioStream" />
       </div>
     </file-input>
 
@@ -51,6 +61,7 @@ import { computed, defineComponent, Ref, ref, watch } from 'vue';
  * Internal dependencies.
  */
 import { Base64 } from 'js-base64';
+import { MicrophoneIcon } from '@heroicons/vue/24/outline';
 import useCreateSecret from '@/composables/useCreateSecret';
 import SelectSlackUser from '@/pages/Home/components/SelectSlackUser/SelectSlackUser.vue';
 import useApiToken from '@/composables/integrations/slack/useApiToken';
@@ -65,6 +76,8 @@ import useNotifications from '@/composables/useNotifications';
 import { SecretInfo } from '@/types/SecretInfo';
 import { FileInfo } from '@/types/FileInfo';
 import { CreateMethodData } from '@/types/CreateMethodData';
+import RecordAudio from '@/pages/Home/components/RecordAudio/RecordAudio.vue';
+import AudioPlayer from '@/pages/Home/components/AudioPlayer/AudioPlayer.vue';
 
 export type CreatedEventPayload = { secretUrl: string; createMethod: ShareMethod; createMethodData?: CreateMethodData };
 
@@ -72,7 +85,10 @@ export default defineComponent({
   name: 'CreateSecret',
 
   components: {
+    AudioPlayer,
+    RecordAudio,
     FileInput,
+    MicrophoneIcon,
     SelectSlackUser,
     SelectShareMethod,
   },
@@ -93,11 +109,15 @@ export default defineComponent({
     const selectedSlackUser: Ref<SlackUser | null> = ref(null);
     const hasError = ref(false);
     const secret = ref('');
+    const createSecretState = ref('RECORDING');
     const fileInfo: Ref<FileInfo | null> = ref(null);
     const isSlackCreateMethod = computed(() => createMethod.value === ShareMethod.SLACK);
     const { createSecret, isCreating } = useCreateSecret();
     const { isSending, sendMessage } = useSendMessage();
     const { setErrorMessage } = useNotifications();
+    const showRecording = computed(() => createSecretState.value === 'RECORDING');
+    const isAudioRecording = computed(() => fileInfo.value?.type === 'audio/webm');
+    const audioStream = ref<Blob | null>(null);
     const onCreateSecret = async () => {
       if (!stream) {
         hasError.value = true;
@@ -163,12 +183,25 @@ export default defineComponent({
       selectedSlackUser.value = { ...user };
     };
 
+    const recordAudio = () => {
+      createSecretState.value = 'RECORDING';
+    };
+
     const onFile = async (file: File) => {
       stream = file.stream();
       fileInfo.value = {
         name: file.name,
         type: file.type,
       };
+    };
+    const onAudioStream = (s: Blob) => {
+      audioStream.value = s;
+      stream = s.stream();
+      fileInfo.value = {
+        name: 'audio.webm',
+        type: 'audio/webm',
+      };
+      createSecretState.value = 'INITIAL';
     };
     const onFileError = () => {
       setErrorMessage({ message: 'File is larger than 40MB' });
@@ -198,12 +231,17 @@ export default defineComponent({
       hasError,
       onFile,
       fileInfo,
+      showRecording,
+      recordAudio,
       onFileError,
       onCreateSecret,
       isButtonDisabled,
       selectedSlackUser,
       onSlackUserSelected,
       isSlackFeatureEnabled,
+      onAudioStream,
+      isAudioRecording,
+      audioStream,
       isLoading: computed(() => isCreating.value || isSending.value || isLoading.value),
       isSlackCreateMethod: computed(() => createMethod.value === ShareMethod.SLACK),
     };
