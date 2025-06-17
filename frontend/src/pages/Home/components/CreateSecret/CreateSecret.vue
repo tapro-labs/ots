@@ -137,10 +137,11 @@ export default defineComponent({
         };
 
         if (fileInfo.value) {
+          // TODO: fix type check
           secretInfo = {
-            type: 'file',
+            type: fileInfo.value.type === 'audio/webm' ? 'audio' : 'file',
             info: fileInfo.value,
-          };
+          } as any;
         }
 
         const secretKey = await createEncryptionKey(DEFAULT_SECRET_LENGTH);

@@ -19,11 +19,13 @@
             <template v-else-if="showSecret && !isLoading">
               <div class="form-control mb-4">
                 <textarea
-                  v-if="!isFile"
+                  v-if="!isFile && !isAudio"
                   :value="decryptedSecret"
                   class="textarea reveal-secret-textarea textarea-disabled"
                   disabled
                 />
+
+                <audio-player v-if="isAudio && audioStream" :blob="audioStream" />
 
                 <label class="label">
                   <span class="text-info font-bold label-text-alt">
@@ -37,7 +39,7 @@
             <template v-else>
               <p>Click the button to reveal secret</p>
 
-              <p v-if="isFile && isLoading">
+              <p v-if="(isFile || isAudio) && isLoading">
                 It seems someone has sent you a file 😁. Please be patient while the file is being fetched!
               </p>
 
@@ -73,11 +75,13 @@ import useDecryptData from '@/composables/useDecryptData';
 import EncryptStreamTransformer from '@/stream-transformers/EncryptStreamTransformer';
 import GenericStreamTransformation from '@/stream-transformers/GenericStreamTransformation';
 import { base64ToString, base64ToUint8Array } from '@/utils/helpers';
+import AudioPlayer from '@/pages/Home/components/AudioPlayer/AudioPlayer.vue';
 
 export default defineComponent({
   name: 'Secret',
 
   components: {
+    AudioPlayer,
     TheHeader,
   },
 
@@ -87,6 +91,7 @@ export default defineComponent({
     const showSecret = ref(false);
     const secretId = route.params.secretId as SecretId;
     const errorMessage = ref('');
+    const audioStream = ref<Blob | null>(null);
     const { secret, isError, isLoading } = useFetchSecret({
       secretId,
       enabled: showSecret,
@@ -172,19 +177,35 @@ export default defineComponent({
           decryptedSecret.value = secretData;
         } else if (cryptographyDetails.value.secretInfo.type === 'file') {
           await downloadFile(stream, cryptographyDetails.value.secretInfo.info);
+        } else if (cryptographyDetails.value.secretInfo.type === 'audio') {
+          const reader = stream.pipeThrough(new GenericStreamTransformation(base64ToUint8Array)).getReader();
+          const chunks = [];
+          let isDone = false;
+
+          do {
+            const { done, value } = await reader.read();
+
+            isDone = done;
+            chunks.push(value);
+          } while (!isDone);
+
+          audioStream.value = new Blob(chunks as any, { type: cryptographyDetails.value.secretInfo.info?.type });
         }
       } catch (e) {
         errorMessage.value = 'Cannot decrypt your secret! Please create a new secret and copy the full URL.';
       }
     });
     const isFile = computed(() => cryptographyDetails.value?.secretInfo?.type === 'file');
+    const isAudio = computed(() => cryptographyDetails.value?.secretInfo?.type === 'audio');
 
     return {
+      isAudio,
       isFile,
       secretId,
       isLoading,
       showSecret,
       errorMessage,
+      audioStream,
       decryptedSecret,
     };
   },

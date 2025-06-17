@@ -12,4 +12,6 @@ export type FileSecretInfo = {
   info: FileInfo;
 };
 
-export type SecretInfo = PlainSecretInfo | FileSecretInfo;
+export type AudioSecretInfo = FileInfo & { type: 'audio' };
+
+export type SecretInfo = PlainSecretInfo | FileSecretInfo | AudioSecretInfo;
