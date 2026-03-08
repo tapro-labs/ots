@@ -94,7 +94,7 @@ jobs:
         with:
           toolchain: 1.85
       - name: Install cross
-        run: cargo install cross --force
+        run: cargo install cross --git https://github.com/cross-rs/cross --locked --force
       - name: Compute short github commit hash
         run: echo "GITHUB_SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-7`" >> $GITHUB_ENV
       - name: Build for x86-64
