@@ -6,6 +6,8 @@ use redis::{
 };
 use utils::time::Time;
 
+use crate::SecretStore;
+
 pub type RedisResult<T> = RResult<T>;
 
 #[derive(Envconfig)]
@@ -81,5 +83,15 @@ impl RedisStore {
         self.forget(&key).unwrap_or(());
 
         value
+    }
+}
+
+impl SecretStore for RedisStore {
+    fn store_for_a_period(&mut self, key: String, value: &str, time: Time) -> Result<(), String> {
+        RedisStore::store_for_a_period(self, key, value, time).map_err(|e| e.to_string())
+    }
+
+    fn get_and_forget(&mut self, key: String) -> Result<String, String> {
+        RedisStore::get_and_forget(self, key).map_err(|e| e.to_string())
     }
 }

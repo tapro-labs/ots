@@ -1,3 +1,6 @@
+use std::sync::Mutex;
+use store::redis_store::RedisStore;
+use store::SecretStore;
 use utils::global_options::GlobalOptions;
 use utils::logger::info;
 
@@ -15,6 +18,11 @@ async fn main() {
 
     server = utils::versioning::init_rocket_module(server);
     server = integrations::init_routes(server);
+
+    let store: Mutex<Box<dyn SecretStore>> =
+        Mutex::new(Box::new(RedisStore::connect_default()));
+    server = server.manage(store);
+
     server = app::init_routes(server);
 
     info(format!("App version is: {}", GlobalOptions::default().build_version));

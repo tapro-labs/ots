@@ -17,6 +17,9 @@ envconfig = { workspace = true }
 [build-dependencies]
 dotenvy = { version = "0.15.7" }
 
+[dev-dependencies]
+mockall = "0.13"
+
 [workspace]
 members = ["features/*", "lib/*"]
 

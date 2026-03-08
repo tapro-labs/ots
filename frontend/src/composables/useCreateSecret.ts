@@ -10,7 +10,9 @@ import otsClient from '@/utils/otsClient';
 import { SecretId } from '@/types/SecretTypes';
 import useEncryptData, { EncryptStreamOptions } from '@/composables/useEncryptData';
 
-export type CreateSecretOptions = EncryptStreamOptions;
+export type CreateSecretOptions = EncryptStreamOptions & {
+  expirySeconds: number;
+};
 
 export default function useCreateSecret() {
   const { encryptStream } = useEncryptData();
@@ -31,6 +33,7 @@ export default function useCreateSecret() {
 
     const response = await otsClient.post('/secrets', {
       secret: secretData,
+      expiry_seconds: data.expirySeconds,
     });
 
     return response.data.secretId as SecretId;

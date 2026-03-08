@@ -39,14 +39,22 @@
         <select-slack-user v-if="isSlackCreateMethod" class="ml-4" @change="onSlackUserSelected" />
       </div>
 
-      <button
-        :class="{ loading: isLoading }"
-        :disabled="isButtonDisabled"
-        class="btn btn-primary"
-        @click="onCreateSecret"
-      >
-        Create Secret
-      </button>
+      <div class="flex items-center gap-3 ml-auto">
+        <select v-model="expirySeconds" class="select select-bordered">
+          <option v-for="opt in expiryOptions" :key="opt.value" :value="opt.value">
+            {{ opt.label }}
+          </option>
+        </select>
+
+        <button
+          :class="{ loading: isLoading }"
+          :disabled="isButtonDisabled"
+          class="btn btn-primary"
+          @click="onCreateSecret"
+        >
+          Create Secret
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -110,6 +118,18 @@ export default defineComponent({
     const hasError = ref(false);
     const secret = ref('');
     const createSecretState = ref('INITIAL');
+
+    const expiryOptions = [
+      { label: '5 minutes', value: 300 },
+      { label: '30 minutes', value: 1800 },
+      { label: '1 hour', value: 3600 },
+      { label: '4 hours', value: 14400 },
+      { label: '12 hours', value: 43200 },
+      { label: '24 hours', value: 86400 },
+      { label: '2 days', value: 172800 },
+      { label: '5 days', value: 432000 },
+    ];
+    const expirySeconds = ref(86400);
     const fileInfo: Ref<FileInfo | null> = ref(null);
     const isSlackCreateMethod = computed(() => createMethod.value === ShareMethod.SLACK);
     const { createSecret, isCreating } = useCreateSecret();
@@ -145,7 +165,7 @@ export default defineComponent({
         }
 
         const secretKey = await createEncryptionKey(DEFAULT_SECRET_LENGTH);
-        const secretId = await createSecret({ data: stream, key: secretKey });
+        const secretId = await createSecret({ data: stream, key: secretKey, expirySeconds: expirySeconds.value });
         const cryptograhyDetails = Base64.btoa(JSON.stringify({ secretKey, secretInfo }));
         const secretUrl = window.location.origin + '/secret/' + secretId + '#' + cryptograhyDetails;
 
@@ -247,6 +267,8 @@ export default defineComponent({
       onAudioStream,
       isAudioRecording,
       audioStream,
+      expirySeconds,
+      expiryOptions,
       isLoading: computed(() => isCreating.value || isSending.value || isLoading.value),
       isSlackCreateMethod: computed(() => createMethod.value === ShareMethod.SLACK),
     };
