@@ -49,7 +49,7 @@ jobs:
         working-directory: ./frontend
     steps:
       - uses: actions/checkout@v4
-      - uses: volta-cli/action@d253558a6e356722728a10e9a469190de21a83ef
+      - uses: volta-cli/action@615a78f6c83e116339c53b94f3f82b4d6c0b7d18
       - name: Install dependencies
         run: yarn --frozen-lockfile
       - name: Build app
