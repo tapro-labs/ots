@@ -18,12 +18,14 @@
 
             <template v-else-if="showSecret && !isLoading">
               <div class="form-control mb-4">
-                <textarea
-                  v-if="!isFile && !isAudio"
-                  :value="decryptedSecret"
-                  class="textarea reveal-secret-textarea textarea-disabled"
-                  disabled
-                />
+                <div v-if="!isFile && !isAudio" class="flex">
+                  <textarea
+                    :value="decryptedSecret"
+                    class="textarea reveal-secret-textarea textarea-disabled flex-1"
+                    disabled
+                  />
+                  <copy-to-clipboard :text="decryptedSecret" success-message="Secret copied to clipboard!" />
+                </div>
 
                 <audio-player v-if="isAudio && audioStream" :blob="audioStream" />
 
@@ -76,12 +78,14 @@ import EncryptStreamTransformer from '@/stream-transformers/EncryptStreamTransfo
 import GenericStreamTransformation from '@/stream-transformers/GenericStreamTransformation';
 import { base64ToString, base64ToUint8Array } from '@/utils/helpers';
 import AudioPlayer from '@/pages/Home/components/AudioPlayer/AudioPlayer.vue';
+import CopyToClipboard from '@/components/CopyToClipboard/CopyToClipboard.vue';
 
 export default defineComponent({
   name: 'Secret',
 
   components: {
     AudioPlayer,
+    CopyToClipboard,
     TheHeader,
   },
 
