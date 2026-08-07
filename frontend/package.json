@@ -24,7 +24,7 @@
     "daisyui": "3.9.4",
     "epic-spinners": "^2.0.0",
     "js-base64": "^3.7.7",
-    "nanoid": "^4.0.2",
+    "nanoid": "^5.0.0",
     "qrcode.vue": "^3.4.1",
     "vue": "^3.4.27",
     "vue-lottie": "^0.2.1",
