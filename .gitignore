@@ -17,3 +17,5 @@ server_ssl/*
 !server_ssl/default.conf
 
 *.log
+
+.claude

@@ -23,8 +23,16 @@
  * External dependencies.
  */
 import { nanoid } from 'nanoid';
-import { templateRef } from '@vueuse/core';
-import { computed, defineComponent, getCurrentInstance, onBeforeUnmount, onMounted, Ref, ref } from 'vue';
+import {
+  computed,
+  defineComponent,
+  getCurrentInstance,
+  onBeforeUnmount,
+  onMounted,
+  Ref,
+  ref,
+  useTemplateRef,
+} from 'vue';
 
 /**
  * Internal dependencies.
@@ -73,7 +81,7 @@ export default defineComponent({
 
   setup(props, { emit, slots }) {
     const inputId = 'input-' + nanoid();
-    const input = templateRef<HTMLInputElement>('input');
+    const input = useTemplateRef<HTMLInputElement>('input');
     const dragActive = ref(false);
     const dragOver = ref(false);
     const error: Ref<Error | null> = ref(null);

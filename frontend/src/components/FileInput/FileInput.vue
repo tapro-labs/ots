@@ -31,6 +31,15 @@ import { ArrowUpTrayIcon as UploadIcon } from '@heroicons/vue/24/outline';
 import Dropzone from '@/components/Dropzone/Dropzone.vue';
 import FileTooLargeError from '@/exceptions/FileTooLargeError';
 
+// e.g. "40MB", "512kb", "1.5GB" or a plain number of bytes
+const SIZE_PATTERN = /^(\d+(?:\.\d+)?)\s*(B|KB|MB|GB)?$/i;
+const UNIT_MULTIPLIERS: Record<string, number> = {
+  B: 1,
+  KB: 1024,
+  MB: 1024 * 1024,
+  GB: 1024 * 1024 * 1024,
+};
+
 export default defineComponent({
   name: 'FileInput',
 
@@ -45,6 +54,7 @@ export default defineComponent({
     maxSize: {
       type: String,
       default: '1MB',
+      validator: (value: string) => SIZE_PATTERN.test(value.trim()),
     },
   },
 
@@ -61,18 +71,9 @@ export default defineComponent({
   setup(props, { emit }) {
     const { maxSize } = toRefs(props);
     const fileMaxSizeInBytes = computed(() => {
-      let size = parseInt(maxSize.value.slice(0, -2));
-      const type = maxSize.value.slice(-2);
+      const [, size, unit = 'B'] = maxSize.value.trim().match(SIZE_PATTERN) || [];
 
-      if (type === 'GB') {
-        size *= 1024 * 1024 * 1024;
-      } else if (type === 'MB') {
-        size *= 1024 * 1024;
-      } else if (type === 'KB') {
-        size *= 1024;
-      }
-
-      return size;
+      return parseFloat(size) * UNIT_MULTIPLIERS[unit.toUpperCase()];
     });
     const fileValidation = (file: File) => {
       if (file.size > fileMaxSizeInBytes.value) {

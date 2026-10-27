@@ -22,9 +22,11 @@ export type SlackUser = {
 export default function useFetchUsers() {
   const { apiToken, resetApiToken } = useApiToken();
 
-  const { data, isLoading, isError, fetchStatus } = useQuery<SlackUser[]>(
-    ['slack-users', apiToken],
-    async () => {
+  // In v5, isLoading is only true while the first fetch runs (isPending && isFetching),
+  // so a disabled query does not report that it is loading.
+  const { data, isLoading, isError } = useQuery<SlackUser[]>({
+    queryKey: ['slack-users', apiToken],
+    queryFn: async () => {
       try {
         const response = await otsClient.get('/integrations/slack/users', {
           headers: {
@@ -43,17 +45,12 @@ export default function useFetchUsers() {
         }
       }
     },
-    {
-      enabled: computed(() => Boolean(apiToken.value)),
-    }
-  );
+    enabled: computed(() => Boolean(apiToken.value)),
+  });
 
   return {
     isError,
     users: computed(() => data.value || []),
-    // Query has changed how isLoading works 🤦‍
-    // @see https://github.com/TanStack/query/issues/3584 (reported issue)
-    // @see https://github.com/TanStack/query/issues/3975#issuecomment-1245101647 (v5 fix)
-    isLoading: computed(() => isLoading.value && fetchStatus.value !== 'idle'),
+    isLoading,
   };
 }

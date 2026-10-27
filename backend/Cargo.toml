@@ -2,7 +2,7 @@
 name = "ots_server"
 build = "build.rs"
 version = "1.1.0"
-edition = "2021"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -18,7 +18,7 @@ envconfig = { workspace = true }
 dotenvy = { version = "0.15.7" }
 
 [dev-dependencies]
-mockall = "0.13"
+mockall = "0.15"
 
 [workspace]
 members = ["features/*", "lib/*"]
@@ -26,11 +26,11 @@ members = ["features/*", "lib/*"]
 [workspace.dependencies]
 store = { path = "./lib/store" }
 utils = { path = "./lib/utils" }
-rocket = { version = "0.5.1", features = ["secrets", "json", "tls"] }
-serde = { version = "1.0.202", features = ["derive"] }
-uuid = { version = "1.8", features = ["v4"] }
-reqwest = { version = "0.12.4", features = ["blocking", "json"] }
-envconfig = { version = "0.10" }
+rocket = { version = "0.5.2", features = ["secrets", "json", "tls"] }
+serde = { version = "1.0.229", features = ["derive"] }
+uuid = { version = "1.29", features = ["v4"] }
+reqwest = { version = "0.13.5", features = ["blocking", "json", "query", "form"] }
+envconfig = { version = "0.11.1" }
 
 
 [features]

@@ -4,12 +4,15 @@ export default class StreamLimiter {
 
   constructor(protected bufferSize: number) {
     let onClose: Function;
+    let onError: (_reason: unknown) => void;
     let onChunk: (_data: string) => void;
 
     this.readable = new ReadableStream({
       start(controller) {
         onChunk = data => controller.enqueue(data);
         onClose = () => controller.close();
+        // without this an error on the writable side would leave readers waiting forever
+        onError = reason => controller.error(reason);
       },
     });
 
@@ -28,6 +31,7 @@ export default class StreamLimiter {
 
         onChunk(chunked);
       },
+      abort: reason => onError(reason),
       close: () => {
         while (buffer.length) {
           const chunked = buffer.slice(0, this.bufferSize);

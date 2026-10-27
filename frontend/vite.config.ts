@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 /**
  * External dependencies.
  */
@@ -25,10 +26,9 @@ type TSConfig = {
 };
 
 const tsConfig: TSConfig = JSON.parse(fs.readFileSync(path.resolve('./tsconfig.json'), 'utf8'));
-const alias = Object.keys(tsConfig.compilerOptions.paths).reduce((acc, aliasKey) => {
-  acc[aliasKey.replace('/*', '')] = tsConfig.compilerOptions.paths[aliasKey].map(aliasPath =>
-    path.resolve(aliasPath.replace('/*', ''))
-  );
+// Vite needs one string per alias, so use the first path of each tsconfig entry.
+const alias = Object.keys(tsConfig.compilerOptions.paths).reduce<Record<string, string>>((acc, aliasKey) => {
+  acc[aliasKey.replace('/*', '')] = path.resolve(tsConfig.compilerOptions.paths[aliasKey][0].replace('/*', ''));
 
   return acc;
 }, {});
@@ -44,7 +44,7 @@ const getHttpsOptions = () => {
       'Private key and certificate were not found. These are required for hot-module replacement. See server-ssl/README.md'
     );
 
-    return false;
+    return undefined;
   }
 };
 
@@ -63,5 +63,11 @@ export default defineConfig({
     alias: {
       ...alias,
     },
+  },
+  test: {
+    environment: 'jsdom',
+    include: ['src/**/*.spec.ts'],
+    setupFiles: ['src/test-utils/setup.ts'],
+    restoreMocks: true,
   },
 });

@@ -72,7 +72,7 @@ import { Base64 } from 'js-base64';
 import { SecretId } from '@/types/SecretTypes';
 import useFetchSecret from '@/composables/useFetchSecret';
 import TheHeader from '@/components/TheHeader/TheHeader.vue';
-import { SecretCryptograhyKey } from '@/utils/cryptography';
+import { SecretCryptograhyKey, sha256Hex } from '@/utils/cryptography';
 import useDecryptData from '@/composables/useDecryptData';
 import EncryptStreamTransformer from '@/stream-transformers/EncryptStreamTransformer';
 import GenericStreamTransformation from '@/stream-transformers/GenericStreamTransformation';
@@ -104,6 +104,7 @@ export default defineComponent({
     const cryptographyDetails: ComputedRef<{
       secretKey: SecretCryptograhyKey;
       secretInfo: { type: string; info?: any };
+      checksum?: string;
     }> = computed(() => {
       try {
         return JSON.parse(Base64.atob(route.hash.replace('#', '')));
@@ -142,6 +143,15 @@ export default defineComponent({
     });
     watch(secret, async secretValue => {
       if (!secretValue) {
+        return;
+      }
+
+      // links created before checksums existed have none, they skip this check
+      const expectedChecksum = cryptographyDetails.value.checksum;
+
+      if (expectedChecksum && (await sha256Hex(secretValue as string)) !== expectedChecksum) {
+        errorMessage.value = 'The secret was changed after it was created! Please ask for a new secret.';
+
         return;
       }
 
@@ -190,7 +200,10 @@ export default defineComponent({
             const { done, value } = await reader.read();
 
             isDone = done;
-            chunks.push(value);
+
+            if (value) {
+              chunks.push(value);
+            }
           } while (!isDone);
 
           audioStream.value = new Blob(chunks as any, { type: cryptographyDetails.value.secretInfo.info?.type });

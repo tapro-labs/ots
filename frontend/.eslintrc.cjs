@@ -6,10 +6,10 @@ module.exports = {
   },
   plugins: ['unicorn'],
   extends: [
-    'plugin:no-unsanitized/DOM',
+    'plugin:no-unsanitized/recommended-legacy',
     'plugin:import/errors',
     'plugin:import/warnings',
-    'plugin:vue/vue3-recommended',
+    'plugin:vue/recommended',
     'eslint:recommended',
   ],
   rules: {
@@ -85,7 +85,6 @@ module.exports = {
     'vue/require-direct-export': 'error',
     'vue/require-v-for-key': 'warn',
     'vue/this-in-template': 'error',
-    'vue/v-on-function-call': ['error', 'never'],
     'vue/v-slot-style': 'error',
     'vue/valid-v-for': 'error',
     'vue/valid-v-slot': 'error',

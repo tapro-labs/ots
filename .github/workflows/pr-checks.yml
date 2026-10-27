@@ -5,6 +5,9 @@ on:
       - opened
       - reopened
       - synchronize
+  push:
+    branches:
+      - 'main'
 
 jobs:
   # JOB to run change detection
@@ -13,6 +16,7 @@ jobs:
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
+      cli: ${{ steps.filter.outputs.cli }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50
@@ -23,6 +27,8 @@ jobs:
               - 'backend/**'
             frontend:
               - 'frontend/**'
+            cli:
+              - 'cli/**'
 
   base_check:
     runs-on: ubuntu-latest
@@ -46,6 +52,8 @@ jobs:
         run: yarn --frozen-lockfile
       - name: Linting
         run: yarn code-lint-check && yarn style-lint-check
+      - name: Unit tests
+        run: yarn test
       - name: Build app
         run: cp .env.example .env && yarn build
 
@@ -56,6 +64,12 @@ jobs:
     defaults:
       run:
         working-directory: ./backend
+    services:
+      # for the store tests marked #[ignore] that need a live Redis
+      redis:
+        image: redis:7.2.5-alpine
+        ports:
+          - 6379:6379
     steps:
       - uses: actions/checkout@v4
       - uses: actions/cache@v3
@@ -70,11 +84,35 @@ jobs:
       - name: Install rust version
         uses: dtolnay/rust-toolchain@0e66bd3e6b38ec0ad5312288c83e47c143e6b09e
         with:
-          toolchain: 1.80
+          toolchain: "1.99"
       - name: Linting
         run: make lint
+      - name: Unit tests
+        run: cargo test --workspace --all-features
+      - name: Redis store tests
+        run: cargo test -p store -- --ignored
       - name: Build
         run: make build
         env:
           ROCKET_PROFILE: release
           ENABLED_FEATURES: ${{ secrets.ENABLED_FEATURES }}
+
+  cli_check:
+    needs: changes
+    if: ${{ needs.changes.outputs.cli == 'true' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./cli
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: cli/go.mod
+          cache-dependency-path: cli/go.sum
+      - name: Formatting
+        run: test -z "$(gofmt -l .)" || (gofmt -l . && exit 1)
+      - name: Vet
+        run: go vet ./...
+      - name: Unit tests
+        run: go test ./...

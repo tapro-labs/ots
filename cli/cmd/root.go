@@ -1,8 +1,8 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
+	"io"
 	"net/url"
 	"os"
 	"slices"
@@ -45,12 +45,15 @@ Examples:
   ots --text "hello" --url https://ots.example.com/api`,
 		Version:      "1.0.0",
 		SilenceUsage: true,
+		// Reject `ots my secret`: without this the words are ignored and stdin is read.
+		Args: cobra.NoArgs,
 	}
 
 	cmd.Flags().StringVarP(&flagText, "text", "t", "", "Secret text to encrypt")
 	cmd.Flags().StringVarP(&flagFile, "file", "f", "", "Path to a file to encrypt and share")
 	cmd.Flags().IntVarP(&flagExpiry, "expiry", "e", 86400, "Expiry in seconds (allowed: 300, 1800, 3600, 14400, 43200, 86400, 172800, 432000)")
 	cmd.Flags().StringVar(&flagURL, "url", "", "OTS API base URL (overrides ~/.config/ots/config.json)")
+	cmd.MarkFlagsMutuallyExclusive("text", "file")
 
 	cmd.RunE = func(cmd *cobra.Command, _ []string) error {
 		return runCmd(cmd, flagText, flagFile, flagExpiry, flagURL)
@@ -98,7 +101,7 @@ func runCmd(cmd *cobra.Command, flagText, flagFile string, flagExpiry int, flagU
 
 	default:
 		// No flags — read from stdin (piped or interactive terminal)
-		text, readErr := readInput()
+		text, readErr := readInput(cmd.InOrStdin(), cmd.ErrOrStderr())
 		if readErr != nil {
 			return readErr
 		}
@@ -123,7 +126,7 @@ func runCmd(cmd *cobra.Command, flagText, flagFile string, flagExpiry int, flagU
 	}
 	origin := parsed.Scheme + "://" + parsed.Host
 
-	fragment, err := crypto.BuildFragment(result.JWK, result.SecretInfo)
+	fragment, err := crypto.BuildFragment(result.JWK, result.SecretInfo, crypto.Checksum(result.Payload))
 	if err != nil {
 		return fmt.Errorf("building fragment: %w", err)
 	}
@@ -134,33 +137,31 @@ func runCmd(cmd *cobra.Command, flagText, flagFile string, flagExpiry int, flagU
 	return nil
 }
 
-// readInput reads the secret text from stdin.
-// If stdin is a TTY (interactive terminal), the user is prompted to type their secret.
-// If stdin is piped, it reads all content directly.
-func readInput() (string, error) {
-	stat, err := os.Stdin.Stat()
+// readInput reads the secret text from in (stdin by default).
+// If in is a TTY (interactive terminal), the user is prompted on prompt to type their secret.
+// If in is piped, it reads all content directly. One trailing newline is removed.
+func readInput(in io.Reader, prompt io.Writer) (string, error) {
+	if f, ok := in.(*os.File); ok {
+		stat, err := f.Stat()
+		if err != nil {
+			return "", fmt.Errorf("checking stdin: %w", err)
+		}
+		if stat.Mode()&os.ModeCharDevice != 0 {
+			fmt.Fprint(prompt, "Enter secret (press Enter then Ctrl+D when done):\n")
+		}
+	}
+
+	// io.ReadAll instead of bufio.Scanner: the scanner fails on lines over 64 KB.
+	data, err := io.ReadAll(in)
 	if err != nil {
-		return "", fmt.Errorf("checking stdin: %w", err)
-	}
-
-	isTerminal := (stat.Mode() & os.ModeCharDevice) != 0
-
-	if isTerminal {
-		fmt.Fprint(os.Stderr, "Enter secret (press Enter then Ctrl+D when done):\n")
-	}
-
-	scanner := bufio.NewScanner(os.Stdin)
-	var lines []string
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	if err := scanner.Err(); err != nil {
 		return "", fmt.Errorf("reading stdin: %w", err)
 	}
 
-	if len(lines) == 0 {
+	text := strings.TrimSuffix(string(data), "\n")
+	text = strings.TrimSuffix(text, "\r")
+	if text == "" {
 		return "", fmt.Errorf("no secret provided: use --text, --file, or pipe input via stdin")
 	}
 
-	return strings.Join(lines, "\n"), nil
+	return text, nil
 }

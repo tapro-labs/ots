@@ -92,7 +92,7 @@ jobs:
       - name: Install rust version
         uses: dtolnay/rust-toolchain@0e66bd3e6b38ec0ad5312288c83e47c143e6b09e
         with:
-          toolchain: 1.85
+          toolchain: "1.99"
       - name: Install cross
         run: cargo install cross --git https://github.com/cross-rs/cross --rev=8a45b3fa536caf67723a4e224c0cd28bfebd7135 --locked --force
       - name: Compute short github commit hash

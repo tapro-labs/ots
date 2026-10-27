@@ -4,7 +4,7 @@
 .vue-notification-group {
   z-index: 9999999 !important;
 
-  @media (max-width <= 479px) {
+  @media (width <= 479px) {
     width: 100% !important;
   }
 }
@@ -35,7 +35,7 @@
       }
     }
 
-    @media (max-width <= 479px) {
+    @media (width <= 479px) {
       border-radius: 0;
       max-width: 100%;
     }

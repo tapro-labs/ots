@@ -1,8 +1,7 @@
 /**
  * External dependencies.
  */
-import { onUnmounted } from 'vue-demi';
-import { getCurrentInstance } from 'vue';
+import { getCurrentInstance, onUnmounted } from 'vue';
 
 /**
  * Internal dependencies.
@@ -47,7 +46,7 @@ export default function useNotifications() {
     localNotificationCallbacks.push(cb);
   };
 
-  if (!currentComponent) {
+  if (currentComponent) {
     onUnmounted(() => {
       localNotificationCallbacks.forEach(unsubscribe);
       localNotificationCallbacks.length = 0;

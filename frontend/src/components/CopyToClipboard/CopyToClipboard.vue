@@ -38,11 +38,19 @@ export default defineComponent({
 
   setup(props) {
     const { text, successMessage } = toRefs(props);
-    const { setSuccessMessage } = useNotifications();
+    const { setSuccessMessage, setErrorMessage } = useNotifications();
 
     return {
-      copy: () => {
-        copy(text.value);
+      copy: async () => {
+        const copied = await copy(text.value);
+
+        if (!copied) {
+          setErrorMessage({
+            message: 'Could not copy to clipboard.',
+          });
+
+          return;
+        }
 
         if (successMessage.value) {
           setSuccessMessage({

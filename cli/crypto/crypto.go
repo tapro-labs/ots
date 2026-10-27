@@ -4,8 +4,11 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"mime"
@@ -16,6 +19,14 @@ import (
 )
 
 const chunkSize = 16 * 1024 // 16 KB — matches the frontend's Uint8StreamLimiter
+
+// randReader is the source of randomness for keys and IVs. Tests replace it to
+// produce fixed vectors and to exercise the error paths.
+var randReader io.Reader = rand.Reader
+
+// ErrEmptySecret is returned when there is no data to encrypt. The frontend
+// cannot decrypt a payload that has no chunks, so an empty secret is rejected.
+var ErrEmptySecret = errors.New("secret is empty: nothing to encrypt")
 
 // JWK is the JSON Web Key representation of the AES-256-GCM encryption key.
 // The shape matches exactly what the browser's SubtleCrypto exportKey('jwk') produces
@@ -53,7 +64,7 @@ type EncryptResult struct {
 // raw key bytes (for use with crypto/aes) and the JWK representation (for the URL fragment).
 func generateKey() ([]byte, JWK, error) {
 	keyBytes := make([]byte, 32)
-	if _, err := rand.Read(keyBytes); err != nil {
+	if _, err := io.ReadFull(randReader, keyBytes); err != nil {
 		return nil, JWK{}, fmt.Errorf("generating key: %w", err)
 	}
 
@@ -88,7 +99,7 @@ func encryptChunk(key []byte, b64Data string) (string, error) {
 	}
 
 	iv := make([]byte, gcm.NonceSize()) // 12 bytes
-	if _, err := rand.Read(iv); err != nil {
+	if _, err := io.ReadFull(randReader, iv); err != nil {
 		return "", fmt.Errorf("generating IV: %w", err)
 	}
 
@@ -120,6 +131,10 @@ func encryptStream(key []byte, r io.Reader) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("reading data: %w", err)
 		}
+	}
+
+	if len(chunks) == 0 {
+		return "", ErrEmptySecret
 	}
 
 	// The browser's EncryptStreamTransformer appends '$_$' after every chunk
@@ -205,14 +220,25 @@ func EncryptFile(path string) (EncryptResult, error) {
 	}, nil
 }
 
-// BuildFragment encodes the JWK and SecretInfo into the base64 string that goes
-// in the URL fragment (#). The shape matches CreateSecret.vue exactly:
+// Checksum returns the lowercase hex SHA-256 of the stored payload. It goes in
+// the URL fragment, which the server never sees, so the recipient can detect a
+// payload with chunks that were dropped, reordered or repeated.
+func Checksum(payload string) string {
+	sum := sha256.Sum256([]byte(payload))
+	return hex.EncodeToString(sum[:])
+}
+
+// BuildFragment encodes the JWK, SecretInfo and payload checksum into the base64
+// string that goes in the URL fragment (#). The shape matches CreateSecret.vue exactly:
 //
-//	Base64.btoa(JSON.stringify({ secretKey, secretInfo }))
-func BuildFragment(jwk JWK, secretInfo SecretInfo) (string, error) {
+//	Base64.btoa(JSON.stringify({ secretKey, secretInfo, checksum }))
+func BuildFragment(jwk JWK, secretInfo SecretInfo, checksum string) (string, error) {
 	payload := map[string]any{
 		"secretKey":  jwk,
 		"secretInfo": secretInfo,
+	}
+	if checksum != "" {
+		payload["checksum"] = checksum
 	}
 
 	jsonBytes, err := json.Marshal(payload)

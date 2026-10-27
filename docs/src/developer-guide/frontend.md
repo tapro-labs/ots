@@ -20,7 +20,7 @@ Instead of installing and managing node and yarn binaries, we recommend using [V
 
 #### Hard
 
-- [NodeJS 14](https://nodejs.org/download/release/v14.21.1/)
+- [NodeJS 24](https://nodejs.org/download/release/v24.22.1/)
 - [Yarn 1.22](https://yarnpkg.com/)
 
 ### Setup 

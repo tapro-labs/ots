@@ -78,7 +78,7 @@ class Droppable {
     this.container.removeEventListener('drop', this.handleDrop);
     this.container.removeEventListener('dragover', this.handleDragOver);
     this.container.removeEventListener('dragenter', this.handleDragEnter);
-    this.container.removeEventListener('dragleave', this.handleDragEnter);
+    this.container.removeEventListener('dragleave', this.handleDragLeave);
     window.removeEventListener('dragenter', this.handleWindowDragEnter);
     window.removeEventListener('dragleave', this.handleWindowDragLeave);
   }
@@ -99,7 +99,7 @@ class Droppable {
 
     this.container.classList.remove(this.overClassName);
 
-    const droppables = document.querySelectorAll('.droppable--active');
+    const droppables = document.querySelectorAll(`.${this.activeClassName}`);
 
     droppables.forEach(node => {
       node.classList.remove(this.activeClassName);

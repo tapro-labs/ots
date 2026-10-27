@@ -64,3 +64,14 @@ export const decrypt = async (secret: SecretCryptograhyKey, encryptedData: strin
     throw e;
   }
 };
+
+/**
+ * Lowercase hex SHA-256 of the stored payload. The creator puts it in the URL fragment,
+ * which the server never sees, so the reader can detect chunks that were dropped,
+ * reordered or repeated. Each chunk alone is authenticated by AES-GCM, the order is not.
+ */
+export const sha256Hex = async (data: string): Promise<string> => {
+  const digest = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(data));
+
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+};

@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-import { computed, ref, Ref } from 'vue';
+import { ref, Ref } from 'vue';
 import { useQuery } from '@tanstack/vue-query';
 
 /**
@@ -18,24 +18,21 @@ export type FetchSecretOptions = {
 export default function useFetchSecret({ secretId, enabled }: FetchSecretOptions) {
   enabled = enabled ?? ref(false);
 
-  const { data, isLoading, fetchStatus, isError } = useQuery(
-    ['secret', secretId],
-    async () => {
+  // In v5, isLoading is only true while the first fetch runs (isPending && isFetching),
+  // so a disabled query does not report that it is loading.
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['secret', secretId],
+    queryFn: async () => {
       const response = await otsClient.get(`/secrets/${secretId}`);
 
       return response.data.secret as SecretData;
     },
-    {
-      enabled,
-    }
-  );
+    enabled,
+  });
 
   return {
     isError,
     secret: data,
-    // Query has changed how isLoading works 🤦‍
-    // @see https://github.com/TanStack/query/issues/3584 (reported issue)
-    // @see https://github.com/TanStack/query/issues/3975#issuecomment-1245101647 (v5 fix)
-    isLoading: computed(() => isLoading.value && fetchStatus.value !== 'idle'),
+    isLoading,
   };
 }

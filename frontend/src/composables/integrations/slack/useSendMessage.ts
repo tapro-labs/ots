@@ -17,16 +17,17 @@ export type SendMessageData = {
 export default function useSendMessage() {
   const { apiToken } = useApiToken();
 
-  const { isLoading, mutateAsync } = useMutation((data: SendMessageData) =>
-    otsClient.post('/integrations/slack/send-message', data, {
-      headers: {
-        Authorization: `Bearer ${apiToken.value}`,
-      },
-    })
-  );
+  const { isPending, mutateAsync } = useMutation({
+    mutationFn: (data: SendMessageData) =>
+      otsClient.post('/integrations/slack/send-message', data, {
+        headers: {
+          Authorization: `Bearer ${apiToken.value}`,
+        },
+      }),
+  });
 
   return {
-    isSending: isLoading,
+    isSending: isPending,
     sendMessage: mutateAsync,
   };
 }

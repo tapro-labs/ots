@@ -165,8 +165,12 @@ export default defineComponent({
         }
 
         const secretKey = await createEncryptionKey(DEFAULT_SECRET_LENGTH);
-        const secretId = await createSecret({ data: stream, key: secretKey, expirySeconds: expirySeconds.value });
-        const cryptograhyDetails = Base64.btoa(JSON.stringify({ secretKey, secretInfo }));
+        const { secretId, checksum } = await createSecret({
+          data: stream,
+          key: secretKey,
+          expirySeconds: expirySeconds.value,
+        });
+        const cryptograhyDetails = Base64.btoa(JSON.stringify({ secretKey, secretInfo, checksum }));
         const secretUrl = window.location.origin + '/secret/' + secretId + '#' + cryptograhyDetails;
 
         // reset secret

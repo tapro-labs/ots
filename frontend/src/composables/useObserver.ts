@@ -1,8 +1,7 @@
 /**
  * External dependencies.
  */
-import { onUnmounted } from 'vue-demi';
-import { getCurrentInstance } from 'vue';
+import { getCurrentInstance, onUnmounted } from 'vue';
 
 /**
  * Internal dependencies.

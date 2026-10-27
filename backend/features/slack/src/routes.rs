@@ -72,3 +72,108 @@ async fn handle_webhook(code: &str) -> Result<Redirect, Status> {
         authentication_status => Err(authentication_status.into()),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use rocket::http::{ContentType, Header};
+    use rocket::local::blocking::Client as LocalClient;
+    use rocket::serde::json::serde_json;
+
+    // Mounted the same way as in the root crate (src/integrations/mod.rs).
+    fn build_client() -> LocalClient {
+        let rocket = rocket::build()
+            .mount("/integrations", integration_routes())
+            .mount("/api/integrations", api_routes());
+        LocalClient::tracked(rocket).expect("valid rocket instance")
+    }
+
+    fn describe(routes: Vec<Route>) -> Vec<String> {
+        let mut described: Vec<String> = routes
+            .into_iter()
+            .map(|route| format!("{} {}", route.method, route.uri.path()))
+            .collect();
+        described.sort();
+        described
+    }
+
+    #[test]
+    fn test_routes_match_frontend_urls() {
+        assert_eq!(
+            describe(api_routes()),
+            vec!["GET /slack/users", "POST /slack/send-message"]
+        );
+        assert_eq!(describe(integration_routes()), vec!["GET /slack/webhook"]);
+    }
+
+    #[test]
+    fn test_send_message_data_reads_camel_case_channel_id() {
+        let data: SendMessageData =
+            serde_json::from_str(r#"{"channelId":"C1","message":"hi"}"#).unwrap();
+
+        assert_eq!(data.channel_id, "C1");
+        assert_eq!(data.message, "hi");
+        assert!(
+            serde_json::from_str::<SendMessageData>(r#"{"channel_id":"C1","message":"hi"}"#)
+                .is_err()
+        );
+    }
+
+    // --- GET /api/integrations/slack/users ---
+
+    #[test]
+    fn test_fetch_users_without_token_is_unauthorized() {
+        let client = build_client();
+        let response = client.get("/api/integrations/slack/users").dispatch();
+
+        assert_eq!(response.status(), Status::Unauthorized);
+    }
+
+    #[test]
+    fn test_fetch_users_with_malformed_token_is_unauthorized() {
+        let client = build_client();
+        let response = client
+            .get("/api/integrations/slack/users")
+            .header(Header::new("Authorization", "Bearer"))
+            .dispatch();
+
+        assert_eq!(response.status(), Status::Unauthorized);
+    }
+
+    // --- POST /api/integrations/slack/send-message ---
+
+    #[test]
+    fn test_send_message_without_token_is_unauthorized() {
+        let client = build_client();
+        let response = client
+            .post("/api/integrations/slack/send-message")
+            .header(ContentType::JSON)
+            .body(r#"{"channelId":"C1","message":"hi"}"#)
+            .dispatch();
+
+        assert_eq!(response.status(), Status::Unauthorized);
+    }
+
+    #[test]
+    fn test_send_message_requires_json_content_type() {
+        let client = build_client();
+        let response = client
+            .post("/api/integrations/slack/send-message")
+            .header(ContentType::Form)
+            .header(Header::new("Authorization", "Bearer session"))
+            .body("channelId=C1&message=hi")
+            .dispatch();
+
+        assert_eq!(response.status(), Status::NotFound);
+    }
+
+    // --- GET /integrations/slack/webhook ---
+
+    #[test]
+    fn test_webhook_without_code_is_rejected_before_calling_slack() {
+        let client = build_client();
+        let response = client.get("/integrations/slack/webhook").dispatch();
+
+        assert!(response.status().class().is_client_error());
+    }
+}

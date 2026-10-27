@@ -187,15 +187,6 @@ func TestEncryptText_LargeInput_ProducesMultipleChunks(t *testing.T) {
 	}
 }
 
-func TestEncryptText_EmptyString(t *testing.T) {
-	// An empty string should either succeed with a valid (empty) encryption or
-	// produce an empty payload — it must not panic or error.
-	_, err := EncryptText("")
-	if err != nil {
-		t.Errorf("EncryptText(\"\") returned unexpected error: %v", err)
-	}
-}
-
 func TestEncryptText_JWKIsValid(t *testing.T) {
 	result, err := EncryptText("test")
 	if err != nil {
@@ -317,7 +308,7 @@ func TestEncryptFile_FileNamePreserved(t *testing.T) {
 
 func TestBuildFragment_IsValidBase64(t *testing.T) {
 	_, jwk, _ := generateKey()
-	fragment, err := BuildFragment(jwk, SecretInfo{Type: "plain"})
+	fragment, err := BuildFragment(jwk, SecretInfo{Type: "plain"}, "")
 	if err != nil {
 		t.Fatalf("BuildFragment: %v", err)
 	}
@@ -329,7 +320,7 @@ func TestBuildFragment_IsValidBase64(t *testing.T) {
 func TestBuildFragment_DecodesWithCorrectKeys(t *testing.T) {
 	_, jwk, _ := generateKey()
 	si := SecretInfo{Type: "file", Info: &FileInfo{Name: "doc.pdf", Type: "application/pdf"}}
-	fragment, err := BuildFragment(jwk, si)
+	fragment, err := BuildFragment(jwk, si, "")
 	if err != nil {
 		t.Fatalf("BuildFragment: %v", err)
 	}
@@ -350,7 +341,7 @@ func TestBuildFragment_DecodesWithCorrectKeys(t *testing.T) {
 
 func TestBuildFragment_SecretKeyMatchesJWK(t *testing.T) {
 	_, jwk, _ := generateKey()
-	fragment, _ := BuildFragment(jwk, SecretInfo{Type: "plain"})
+	fragment, _ := BuildFragment(jwk, SecretInfo{Type: "plain"}, "")
 	raw, _ := base64.StdEncoding.DecodeString(fragment)
 
 	var parsed struct {

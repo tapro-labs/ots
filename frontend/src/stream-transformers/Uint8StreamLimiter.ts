@@ -4,12 +4,15 @@ export default class Uint8StreamLimiter {
 
   constructor(protected bufferSize: number) {
     let onClose: Function;
+    let onError: (_reason: unknown) => void;
     let onChunk: (_data: Uint8Array) => void;
 
     this.readable = new ReadableStream({
       start(controller) {
         onChunk = data => controller.enqueue(data);
         onClose = () => controller.close();
+        // without this an error on the writable side would leave readers waiting forever
+        onError = reason => controller.error(reason);
       },
     });
 
@@ -38,6 +41,7 @@ export default class Uint8StreamLimiter {
           onChunk(new Uint8Array(chunked));
         }
       },
+      abort: reason => onError(reason),
       close: () => {
         emptyBufferOut();
         onClose();

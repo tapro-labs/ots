@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -48,7 +49,7 @@ func LoadURL(flagURL string) (string, error) {
 
 	var cfg Config
 	if err := json.NewDecoder(f).Decode(&cfg); err != nil {
-		return "", err
+		return "", fmt.Errorf("reading config %s: %w", path, err)
 	}
 
 	if cfg.URL == "" {

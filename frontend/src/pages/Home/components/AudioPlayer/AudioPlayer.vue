@@ -9,8 +9,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
-import { templateRef } from '@vueuse/core';
+import { defineComponent, onMounted, useTemplateRef } from 'vue';
 
 export default defineComponent({
   name: 'AudioPlayer',
@@ -23,10 +22,12 @@ export default defineComponent({
   },
 
   setup(props, { emit }) {
-    const audioElement = templateRef<HTMLAudioElement>('audioElement');
+    const audioElement = useTemplateRef<HTMLAudioElement>('audioElement');
 
     onMounted(() => {
-      audioElement.value.src = URL.createObjectURL(props.blob);
+      if (audioElement.value) {
+        audioElement.value.src = URL.createObjectURL(props.blob);
+      }
     });
     return {};
   },

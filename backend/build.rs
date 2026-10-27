@@ -11,8 +11,10 @@ fn main() {
 
         for env_var in dotenv_iter().unwrap() {
             let (key, value) = env_var.unwrap();
-            env::set_var(&key, &value);
-            println!("cargo:rustc-env={}={}", &key, &value);
+            // SAFETY: the build script is single-threaded, nothing reads the
+            // environment concurrently.
+            unsafe { env::set_var(&key, &value) };
+            println!("cargo:rustc-env={}={}", key, value);
         }
     }
 
@@ -41,6 +43,6 @@ fn init_tls() {
     println!(
         "cargo:rustc-env=ROCKET_TLS={{certs=\"{}\",key=\"{}\"}}",
         certs_path.to_str().unwrap(),
-        &key_path.to_str().unwrap()
+        key_path.to_str().unwrap()
     );
 }

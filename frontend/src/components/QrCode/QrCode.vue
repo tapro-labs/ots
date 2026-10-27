@@ -23,8 +23,7 @@
  * External dependencies.
  */
 import QrCodeBox from 'qrcode.vue';
-import { templateRef } from '@vueuse/core';
-import { defineComponent } from 'vue';
+import { defineComponent, useTemplateRef } from 'vue';
 import { QrCodeIcon } from '@heroicons/vue/24/outline';
 
 /**
@@ -49,7 +48,7 @@ export default defineComponent({
   },
 
   setup() {
-    const qrModal = templateRef<HTMLDialogElement | null>('modal');
+    const qrModal = useTemplateRef<HTMLDialogElement>('modal');
     const openModal = () => qrModal.value?.showModal();
     const closeModal = () => qrModal.value?.close();
 
